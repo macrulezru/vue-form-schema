@@ -11,7 +11,6 @@ const props = defineProps<{
 const hasError = computed(() => !!(props.touched && props.error?.length))
 const errorId = computed(() => `${props.field.name}-error`)
 
-/** Bind these onto your <input> / <select> / <textarea> for full a11y support */
 const inputAttrs = computed(() => ({
   'aria-required': props.field.required ? 'true' : undefined,
   'aria-invalid': hasError.value ? 'true' : 'false',
@@ -20,20 +19,24 @@ const inputAttrs = computed(() => ({
 </script>
 
 <template>
-  <div class="vfs-field" :class="[`vfs-field--${props.field.type}`, { 'vfs-field--error': hasError }]">
-    <label v-if="props.field.label" :for="props.field.name" class="vfs-field__label">
-      {{ props.field.label }}
-      <span v-if="props.field.required" class="vfs-field__required" aria-hidden="true">*</span>
+  <div class="mb-4">
+    <label
+      v-if="field.label"
+      :for="field.name"
+      class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5"
+    >
+      {{ field.label }}
+      <span v-if="field.required" class="text-red-400 ml-0.5" aria-hidden="true">*</span>
     </label>
     <slot v-bind="inputAttrs" />
     <ul
       v-if="hasError"
       :id="errorId"
-      class="vfs-field__errors"
+      class="mt-1 space-y-0.5"
       role="alert"
       aria-live="polite"
     >
-      <li v-for="(msg, i) in error" :key="i" class="vfs-field__error">{{ msg }}</li>
+      <li v-for="(msg, i) in error" :key="i" class="text-red-400 text-xs">{{ msg }}</li>
     </ul>
   </div>
 </template>

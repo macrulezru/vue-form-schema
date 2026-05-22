@@ -21,7 +21,7 @@ function onInput(e: Event) {
 </script>
 
 <template>
-  <BaseField :field="field" :error="error" :touched="touched">
+  <BaseField v-slot="aria" :field="field" :error="error" :touched="touched">
     <input
       :id="field.name"
       type="number"
@@ -30,6 +30,7 @@ function onInput(e: Event) {
       :placeholder="field.placeholder"
       :disabled="field.disabled === true"
       :required="field.required"
+      v-bind="aria"
       class="vfs-input"
       @input="onInput"
       @blur="emit('blur')"

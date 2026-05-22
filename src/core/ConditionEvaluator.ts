@@ -53,7 +53,7 @@ export class ConditionEvaluator {
     this.stopHandle = null
   }
 
-  /** Recursively evaluate visible/disabled/required for each field */
+  /** Recursively evaluate visible/disabled/options for each field */
   evaluateFields(
     fields: FieldDefinition[],
     values: Record<string, unknown>,
@@ -61,13 +61,22 @@ export class ConditionEvaluator {
     return fields.map((field) => {
       const visible = this.resolveBoolean(field.visible, values, true)
       const disabled = this.resolveBoolean(field.disabled, values, false)
+      // Async options functions are handled by useForm — return undefined here so
+      // the async cache value (merged later) takes precedence.
+      let options: FieldDefinition['options']
+      if (typeof field.options === 'function') {
+        const result = field.options(values)
+        options = result instanceof Promise ? undefined : result
+      } else {
+        options = field.options
+      }
 
       const resolved: FieldDefinition = {
         ...field,
         visible,
         disabled,
-        fields:
-          field.fields ? this.evaluateFields(field.fields, values) : undefined,
+        options,
+        fields: field.fields ? this.evaluateFields(field.fields, values) : undefined,
       }
 
       return resolved

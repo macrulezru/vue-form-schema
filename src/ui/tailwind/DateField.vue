@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { computed } from 'vue'
 import BaseField from './BaseField.vue'
 import type { FieldDefinition } from '../../core/types'
-import { bindMask } from '../../core/MaskEngine'
 
 const props = defineProps<{
   field: FieldDefinition
@@ -16,36 +15,24 @@ const emit = defineEmits<{
   blur: []
 }>()
 
-const inputRef = ref<HTMLInputElement | null>(null)
-let cleanupMask: (() => void) | null = null
-
-onMounted(() => {
-  if (inputRef.value && props.field.mask) {
-    cleanupMask = bindMask(inputRef.value, props.field.mask)
-  }
-})
-
-onUnmounted(() => cleanupMask?.())
-
-function onInput(e: Event) {
-  emit('update:modelValue', (e.target as HTMLInputElement).value)
-}
+const hasError = computed(() => !!(props.touched && props.error?.length))
 </script>
 
 <template>
   <BaseField v-slot="aria" :field="field" :error="error" :touched="touched">
     <input
       :id="field.name"
-      ref="inputRef"
-      :type="field.type === 'email' ? 'email' : 'text'"
+      type="date"
       :name="field.name"
       :value="modelValue ?? ''"
-      :placeholder="field.placeholder"
       :disabled="field.disabled === true"
       :required="field.required"
       v-bind="aria"
-      class="vfs-input"
-      @input="onInput"
+      class="w-full rounded-lg border bg-gray-900 px-3 py-2 text-sm text-gray-100 outline-none transition focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+      :class="hasError
+        ? 'border-red-500 focus:ring-red-500'
+        : 'border-gray-700 focus:ring-indigo-500 focus:border-indigo-500'"
+      @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       @blur="emit('blur')"
     />
   </BaseField>

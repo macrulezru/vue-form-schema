@@ -65,14 +65,70 @@ export const url: ValidatorFn = (value) => {
   }
 }
 
+export const sameAs =
+  (otherField: string, message?: string): ValidatorFn =>
+  (value, allValues) =>
+    value === allValues[otherField] ? null : (message ?? `Must match ${otherField}`)
+
+// ─── File validators ──────────────────────────────────────────────────────────
+
+function toFileArray(value: unknown): File[] {
+  if (!value) return []
+  if (value instanceof File) return [value]
+  if (Array.isArray(value)) return value.filter((v): v is File => v instanceof File)
+  return []
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
+/** Validate that all selected files match one of the provided MIME-type prefixes or extensions */
+export const fileType =
+  (types: string[], message?: string): ValidatorFn =>
+  (value) => {
+    const files = toFileArray(value)
+    if (!files.length) return null
+    const invalid = files.filter(
+      (f) => !types.some((t) => f.type.startsWith(t) || f.name.toLowerCase().endsWith(t)),
+    )
+    return invalid.length ? (message ?? `Accepted formats: ${types.join(', ')}`) : null
+  }
+
+/** Validate that all selected files are within the size limit */
+export const fileSize =
+  (maxBytes: number, message?: string): ValidatorFn =>
+  (value) => {
+    const files = toFileArray(value)
+    if (!files.length) return null
+    const oversized = files.filter((f) => f.size > maxBytes)
+    return oversized.length
+      ? (message ?? `File size must not exceed ${formatBytes(maxBytes)}`)
+      : null
+  }
+
+/** Validate that no more than maxCount files are selected */
+export const fileCount =
+  (maxCount: number, message?: string): ValidatorFn =>
+  (value) => {
+    const files = toFileArray(value)
+    return files.length > maxCount
+      ? (message ?? `Maximum ${maxCount} file${maxCount === 1 ? '' : 's'} allowed`)
+      : null
+  }
+
 // ─── ValidationEngine ─────────────────────────────────────────────────────────
 
 export class ValidationEngine {
   private asyncTimers = new Map<string, ReturnType<typeof setTimeout>>()
   private readonly debounceMs: number
+  private readonly validateMode: 'first' | 'all'
 
-  constructor(debounceMs = 300) {
+  constructor(debounceMs = 300, validateMode: 'first' | 'all' = 'first') {
     this.debounceMs = debounceMs
+    this.validateMode = validateMode
   }
 
   /** Run sync validators for a single field; returns list of error messages */
@@ -85,12 +141,18 @@ export class ValidationEngine {
 
     if (field.required) {
       const msg = required(value, allValues)
-      if (msg) errors.push(msg)
+      if (msg) {
+        errors.push(msg)
+        if (this.validateMode === 'first') return errors
+      }
     }
 
     for (const validator of field.validators ?? []) {
       const msg = validator(value, allValues)
-      if (msg) errors.push(msg)
+      if (msg) {
+        errors.push(msg)
+        if (this.validateMode === 'first') return errors
+      }
     }
 
     return errors
@@ -172,9 +234,14 @@ export function setByPath(
 
   for (let i = 0; i < keys.length - 1; i++) {
     const key = keys[i]
-    current[key] = current[key] && typeof current[key] === 'object'
-      ? { ...(current[key] as Record<string, unknown>) }
-      : {}
+    const existing = current[key]
+    if (Array.isArray(existing)) {
+      current[key] = [...existing]
+    } else if (existing && typeof existing === 'object') {
+      current[key] = { ...(existing as Record<string, unknown>) }
+    } else {
+      current[key] = {}
+    }
     current = current[key] as Record<string, unknown>
   }
 

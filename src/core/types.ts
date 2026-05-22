@@ -1,3 +1,5 @@
+import type { Component } from 'vue'
+
 // ─── Validator types ──────────────────────────────────────────────────────────
 
 export type ValidatorFn = (
@@ -45,6 +47,7 @@ export type FieldType =
   | 'date'
   | 'array'
   | 'group'
+  | 'file'
 
 export interface FieldDefinition {
   type: FieldType
@@ -52,7 +55,7 @@ export interface FieldDefinition {
   name: string
   label?: string
   placeholder?: string
-  defaultValue?: unknown
+  defaultValue?: unknown | ((values: Record<string, unknown>) => unknown)
   required?: boolean
   /** Static or dynamic disabled state */
   disabled?: boolean | ((values: Record<string, unknown>) => boolean)
@@ -61,10 +64,50 @@ export interface FieldDefinition {
   validators?: ValidatorFn[]
   asyncValidators?: AsyncValidatorFn[]
   mask?: string | MaskConfig
-  /** For select / radio */
-  options?: FieldOption[]
+  /** For select / radio — static list, sync function, or async function */
+  options?: FieldOption[] | ((values: Record<string, unknown>) => FieldOption[] | Promise<FieldOption[]>)
+  /**
+   * Field names whose values trigger re-fetching of async options.
+   * Only relevant when `options` is an async function.
+   */
+  optionsDeps?: string[]
+  /** Internal: set by useForm when async options are loading. Read-only for consumers. */
+  optionsLoading?: boolean
   /** For group and array */
   fields?: FieldDefinition[]
+  /**
+   * Applied on every setField call before the value is stored.
+   * Use for trimming, type coercion, formatting, etc.
+   */
+  transform?: (value: unknown, values: Record<string, unknown>) => unknown
+  /**
+   * Applied at submit time to produce the final payload value.
+   * Runs after all validation passes.
+   */
+  parse?: (raw: unknown) => unknown
+  /**
+   * Custom Vue component to render this field.
+   * Receives FormFieldProps and must emit 'update:modelValue' and 'blur'.
+   */
+  component?: Component | string
+  // ─── File field options ───────────────────────────────────────────────────
+  /** Accepted file types, e.g. "image/*,.pdf" — passed to <input accept> */
+  accept?: string
+  /** Allow selecting multiple files */
+  multiple?: boolean
+  /** Maximum file size in bytes */
+  maxSize?: number
+  /** Maximum number of files (only relevant when multiple=true) */
+  maxFiles?: number
+}
+
+// ─── Custom field component contract ─────────────────────────────────────────
+
+export interface FormFieldProps {
+  field: FieldDefinition
+  modelValue: unknown
+  error: string[]
+  touched: boolean
 }
 
 // ─── JSON schema subset (used by parseJSON) ───────────────────────────────────
@@ -88,14 +131,24 @@ export type JSONSchema = JSONSchemaField[]
 
 // ─── useForm config ───────────────────────────────────────────────────────────
 
-export type ValidateOn = 'input' | 'blur' | 'submit'
+export type ValidateOn = 'input' | 'blur' | 'submit' | 'eager'
+
+export type ValidateMode = 'first' | 'all'
 
 export interface UseFormConfig<T extends Record<string, unknown> = Record<string, unknown>> {
   schema: FieldDefinition[] | JSONSchema
   initialValues?: Partial<T>
   validateOn?: ValidateOn
+  /** 'first' returns only the first error per field (default); 'all' returns all errors */
+  validateMode?: ValidateMode
   clearOnHide?: boolean
   onSubmit?: (values: T) => void | Promise<void>
+  /** Persist form values to storage between page reloads */
+  persist?: false | 'session' | 'local'
+  /** Storage key prefix. Defaults to a hash of the schema field names. */
+  persistKey?: string
+  /** Log state changes to console */
+  debug?: boolean
 }
 
 // ─── useForm return ───────────────────────────────────────────────────────────
@@ -107,6 +160,8 @@ export interface UseFormReturn<T extends Record<string, unknown> = Record<string
   values: Ref<T>
   errors: Ref<Record<string, string[]>>
   touched: Ref<Record<string, boolean>>
+  /** Per-field async options loading state */
+  optionsLoading: Ref<Record<string, boolean>>
   isDirty: ComputedRef<boolean>
   isValid: ComputedRef<boolean>
   isSubmitting: Ref<boolean>

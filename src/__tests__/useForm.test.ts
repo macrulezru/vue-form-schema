@@ -175,3 +175,72 @@ describe('useForm — isValid', () => {
     expect(wrapper.vm.isValid).toBe(true)
   })
 })
+
+describe('useForm — validateMode', () => {
+  const multiValidatorField: FieldDefinition[] = [{
+    type: 'text',
+    name: 'pass',
+    required: true,
+    validators: [
+      (v) => (String(v).length >= 8 ? null : 'Min 8 chars'),
+      (v) => (/[A-Z]/.test(String(v)) ? null : 'Need uppercase'),
+    ],
+  }]
+
+  it('mode=first returns only first error', async () => {
+    const wrapper = mountForm({ schema: multiValidatorField, validateMode: 'first' })
+    await wrapper.vm.submit()
+    const errs = wrapper.vm.errors['pass']
+    expect(errs.length).toBe(1)
+  })
+
+  it('mode=all returns all errors', async () => {
+    const wrapper = mountForm({ schema: multiValidatorField, validateMode: 'all' })
+    await wrapper.vm.submit()
+    const errs = wrapper.vm.errors['pass']
+    // required + min 8 chars + need uppercase = 3 errors for empty value
+    expect(errs.length).toBeGreaterThan(1)
+  })
+})
+
+describe('useForm — validateOn=eager', () => {
+  it('does not validate on change before first blur', async () => {
+    const wrapper = mountForm({ schema: basicFields, validateOn: 'eager' })
+    wrapper.vm.setField('name', '')
+    await nextTick()
+    expect(wrapper.vm.errors['name']).toBeUndefined()
+  })
+
+  it('validates on change after field has been blurred', async () => {
+    const wrapper = mountForm({ schema: basicFields, validateOn: 'eager' })
+    // simulate blur
+    ;(wrapper.vm as unknown as { touchField: (p: string) => void }).touchField('name')
+    await nextTick()
+    // now change should trigger validation
+    wrapper.vm.setField('name', '')
+    await nextTick()
+    expect(wrapper.vm.errors['name']).toBeTruthy()
+  })
+})
+
+describe('useForm — dynamic options', () => {
+  it('evaluates options function reactively', async () => {
+    const fields: FieldDefinition[] = [
+      { type: 'text', name: 'country' },
+      {
+        type: 'select',
+        name: 'city',
+        options: (values) =>
+          values['country'] === 'ru'
+            ? [{ label: 'Moscow', value: 'msk' }]
+            : [{ label: 'Berlin', value: 'ber' }],
+      },
+    ]
+    const wrapper = mountForm({ schema: fields })
+    wrapper.vm.setField('country', 'ru')
+    await nextTick()
+    const cityField = wrapper.vm.fields.find((f: FieldDefinition) => f.name === 'city')
+    expect(Array.isArray(cityField?.options)).toBe(true)
+    expect((cityField?.options as { value: string }[])[0].value).toBe('msk')
+  })
+})
