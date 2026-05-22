@@ -827,3 +827,13 @@ All entry points are tree-shakeable ESM + CJS dual builds.
 ## License
 
 MIT
+
+---
+
+## Author
+
+Danil Lisin Vladimirovich aka Macrulez
+
+GitHub: [macrulezru](https://github.com/macrulezru) · Website: [macrulez.ru/en](https://macrulez.ru/en)
+
+Questions and bugs — [issues](https://github.com/macrulezru/vue-form-schema/issues)
