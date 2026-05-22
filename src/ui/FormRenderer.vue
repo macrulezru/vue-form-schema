@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, type Component } from 'vue'
 import type { FieldDefinition, UseFormReturn } from '../core/types'
+import { useRegistry } from '../core/registry'
 import { getByPath } from '../core/ValidationEngine'
 import TextField from './fields/TextField.vue'
 import NumberField from './fields/NumberField.vue'
@@ -9,16 +10,21 @@ import SelectField from './fields/SelectField.vue'
 import CheckboxField from './fields/CheckboxField.vue'
 import RadioField from './fields/RadioField.vue'
 import DateField from './fields/DateField.vue'
+import ArrayField from './fields/ArrayField.vue'
+import FileField from './fields/FileField.vue'
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 const props = defineProps<{
   form: UseFormReturn
   /** Override individual field renderers: { text: MyTextInput, ... } */
-  components?: Partial<Record<FieldDefinition['type'], Component>>
+  components?: Partial<Record<FieldDefinition['type'], Component | string>>
   /** Label for the submit button */
   submitLabel?: string
 }>()
+
+// app-level registry (installed via createFormRegistry plugin)
+const registry = useRegistry()
 
 const emit = defineEmits<{
   submit: []
@@ -35,10 +41,13 @@ const defaultComponents: Partial<Record<FieldDefinition['type'], Component>> = {
   checkbox: CheckboxField,
   radio: RadioField,
   date: DateField,
+  file: FileField,
 }
 
-function resolveComponent(type: FieldDefinition['type']): Component | null {
-  return props.components?.[type] ?? defaultComponents[type] ?? null
+function resolveComponent(field: FieldDefinition): Component | string | null {
+  // priority: field.component > prop override > app registry > built-in defaults
+  if (field.component) return field.component
+  return props.components?.[field.type] ?? registry[field.type] ?? defaultComponents[field.type] ?? null
 }
 
 // ─── Field value helpers ──────────────────────────────────────────────────────
@@ -103,10 +112,18 @@ async function onSubmit(e: Event) {
         />
       </fieldset>
 
-      <!-- known field component -->
+      <!-- array -->
+      <ArrayField
+        v-else-if="field.type === 'array'"
+        :field="field"
+        :form="form"
+        :components="components"
+      />
+
+      <!-- known field component (field.component wins over type-based lookup) -->
       <component
-        :is="resolveComponent(field.type)"
-        v-else-if="resolveComponent(field.type)"
+        :is="resolveComponent(field)"
+        v-else-if="resolveComponent(field)"
         :field="field"
         :model-value="getValue(field)"
         :error="getErrors(field)"
