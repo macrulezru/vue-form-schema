@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(cd \"c:\\\\work\\\\vue-form-schema\" && npx vite --config vite.demo.config.ts 2>&1 &)",
+      "PowerShell(Stop-Process -Name \"node\" -ErrorAction SilentlyContinue)"
+    ]
+  }
+}
