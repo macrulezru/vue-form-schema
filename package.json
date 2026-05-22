@@ -1,6 +1,6 @@
 {
   "name": "@macrulez/vue-form-schema",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Reactive forms from JSON/Zod/Yup schema with validation, masking and conditional UI for Vue 3",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -42,6 +42,24 @@
     "test:coverage": "vitest --coverage",
     "typecheck": "tsc --noEmit"
   },
+  "keywords": [
+    "vue",
+    "vue3",
+    "form",
+    "schema",
+    "validation",
+    "zod",
+    "yup",
+    "composable",
+    "mask",
+    "reactive"
+  ],
+  "author": "macrulez",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/macrulezru/vue-form-schema"
+  },
+  "homepage": "https://macrulez.ru/en",
   "peerDependencies": {
     "vue": "^3.3.0"
   },
