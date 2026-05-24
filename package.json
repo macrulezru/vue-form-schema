@@ -1,6 +1,6 @@
 {
   "name": "@macrulez/vue-form-schema",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Reactive forms from JSON/Zod/Yup/Valibot schema with validation, masking and conditional UI for Vue 3",
   "type": "module",
   "main": "./dist/index.cjs",
