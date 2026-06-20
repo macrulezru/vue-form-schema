@@ -16,6 +16,9 @@ const emit = defineEmits<{
 
 const hasError = computed(() => !!(props.touched && props.error?.length))
 const errorId = computed(() => `${props.field.name}-error`)
+const options = computed(() =>
+  Array.isArray(props.field.options) ? props.field.options : [],
+)
 </script>
 
 <template>
@@ -34,7 +37,7 @@ const errorId = computed(() => `${props.field.name}-error`)
     </legend>
     <div class="space-y-2">
       <label
-        v-for="opt in field.options"
+        v-for="opt in options"
         :key="String(opt.value)"
         class="flex cursor-pointer items-center gap-2.5"
       >

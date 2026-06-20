@@ -16,6 +16,9 @@ const emit = defineEmits<{
 
 const hasError = computed(() => !!(props.touched && props.error?.length))
 const errorId = computed(() => `${props.field.name}-error`)
+const options = computed(() =>
+  Array.isArray(props.field.options) ? props.field.options : [],
+)
 </script>
 
 <template>
@@ -32,7 +35,7 @@ const errorId = computed(() => `${props.field.name}-error`)
     </legend>
     <div class="vfs-radio-group">
       <label
-        v-for="opt in field.options"
+        v-for="opt in options"
         :key="String(opt.value)"
         class="vfs-radio-label"
       >

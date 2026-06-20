@@ -13,8 +13,8 @@ const errorId = computed(() => `${props.field.name}-error`)
 
 /** Bind these onto your <input> / <select> / <textarea> for full a11y support */
 const inputAttrs = computed(() => ({
-  'aria-required': props.field.required ? 'true' : undefined,
-  'aria-invalid': hasError.value ? 'true' : 'false',
+  'aria-required': props.field.required ? ('true' as const) : undefined,
+  'aria-invalid': (hasError.value ? 'true' : 'false') as 'true' | 'false',
   'aria-describedby': hasError.value ? errorId.value : undefined,
 }))
 </script>

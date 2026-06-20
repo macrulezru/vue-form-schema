@@ -18,7 +18,7 @@ const CustomTextInput = defineComponent({
   },
   emits: ['update:modelValue', 'blur'],
   setup(props) {
-    const { hasError, errorMessage, isRequired } = useFormField(props as FormFieldProps)
+    const { hasError, errorMessage, isRequired } = useFormField(props as unknown as FormFieldProps)
     return { hasError, errorMessage, isRequired }
   },
   template: `
@@ -185,7 +185,7 @@ describe('defaultValue as function', () => {
       {
         type: 'text',
         name: 'full',
-        defaultValue: (values) => `${values.first} ${values.last}`,
+        defaultValue: (values: Record<string, unknown>) => `${values.first} ${values.last}`,
       },
     ]
     const w = mount(defineComponent({

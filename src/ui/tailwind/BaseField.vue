@@ -12,8 +12,8 @@ const hasError = computed(() => !!(props.touched && props.error?.length))
 const errorId = computed(() => `${props.field.name}-error`)
 
 const inputAttrs = computed(() => ({
-  'aria-required': props.field.required ? 'true' : undefined,
-  'aria-invalid': hasError.value ? 'true' : 'false',
+  'aria-required': props.field.required ? ('true' as const) : undefined,
+  'aria-invalid': (hasError.value ? 'true' : 'false') as 'true' | 'false',
   'aria-describedby': hasError.value ? errorId.value : undefined,
 }))
 </script>
