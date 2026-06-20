@@ -1,50 +1,66 @@
 {
   "name": "@macrulez/vue-form-schema",
-  "version": "0.1.7",
-  "description": "Reactive forms from JSON/Zod/Yup/Valibot schema with validation, masking and conditional UI for Vue 3",
+  "version": "0.1.8",
+  "description": "Reactive Vue 3 forms generated from JSON, Zod, Yup or Valibot schemas, with validation, input masking, conditional UI and SSR support.",
+  "author": "macrulez <macrulezru@gmail.com> (https://macrulez.ru/en)",
+  "license": "MIT",
+  "homepage": "https://github.com/macrulezru/vue-form-schema#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/macrulezru/vue-form-schema.git"
+  },
+  "bugs": {
+    "url": "https://github.com/macrulezru/vue-form-schema/issues"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     },
     "./zod": {
+      "types": "./dist/zod.d.ts",
       "import": "./dist/zod.js",
-      "require": "./dist/zod.cjs",
-      "types": "./dist/zod.d.ts"
+      "require": "./dist/zod.cjs"
     },
     "./yup": {
+      "types": "./dist/yup.d.ts",
       "import": "./dist/yup.js",
-      "require": "./dist/yup.cjs",
-      "types": "./dist/yup.d.ts"
+      "require": "./dist/yup.cjs"
     },
     "./valibot": {
+      "types": "./dist/valibot.d.ts",
       "import": "./dist/valibot.js",
-      "require": "./dist/valibot.cjs",
-      "types": "./dist/valibot.d.ts"
+      "require": "./dist/valibot.cjs"
     },
     "./ui": {
+      "types": "./dist/ui.d.ts",
       "import": "./dist/ui.js",
-      "require": "./dist/ui.cjs",
-      "types": "./dist/ui.d.ts"
+      "require": "./dist/ui.cjs"
     },
     "./ui/tailwind": {
+      "types": "./dist/ui-tailwind.d.ts",
       "import": "./dist/ui-tailwind.js",
-      "require": "./dist/ui-tailwind.cjs",
-      "types": "./dist/ui-tailwind.d.ts"
+      "require": "./dist/ui-tailwind.cjs"
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
+  "engines": {
+    "node": ">=18"
+  },
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
+    "prepublishOnly": "npm run build",
     "dev": "vite",
     "build": "vite build && tsc -p tsconfig.build.json",
     "demo": "vite --config vite.demo.config.ts",
@@ -60,18 +76,16 @@
     "validation",
     "zod",
     "yup",
-    "composable",
+    "valibot",
     "mask",
-    "reactive"
+    "ssr",
+    "typescript"
   ],
-  "author": "macrulez",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/macrulezru/vue-form-schema"
-  },
-  "homepage": "https://macrulez.ru/en",
   "peerDependencies": {
-    "vue": "^3.3.0"
+    "vue": "^3.3.0",
+    "zod": ">=3.22.0",
+    "yup": ">=1.3.0",
+    "valibot": ">=1.0.0"
   },
   "peerDependenciesMeta": {
     "zod": {
