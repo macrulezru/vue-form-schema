@@ -29,13 +29,7 @@ const inputAttrs = computed(() => ({
       <span v-if="field.required" class="text-red-400 ml-0.5" aria-hidden="true">*</span>
     </label>
     <slot v-bind="inputAttrs" />
-    <ul
-      v-if="hasError"
-      :id="errorId"
-      class="mt-1 space-y-0.5"
-      role="alert"
-      aria-live="polite"
-    >
+    <ul v-if="hasError" :id="errorId" class="mt-1 space-y-0.5" role="alert" aria-live="polite">
       <li v-for="(msg, i) in error" :key="i" class="text-red-400 text-xs">{{ msg }}</li>
     </ul>
   </div>

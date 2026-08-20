@@ -21,6 +21,13 @@ const props = defineProps<{
   components?: Partial<Record<FieldDefinition['type'], Component | string>>
   /** Label for the submit button */
   submitLabel?: string
+  /**
+   * Internal: the field list to render. Used by the `group` case to recurse
+   * into `field.fields` instead of re-rendering the whole top-level schema
+   * (which would recurse into the same group forever). Defaults to the
+   * form's top-level fields — not meant to be passed by consumers.
+   */
+  fields?: FieldDefinition[]
 }>()
 
 // app-level registry (installed via createFormRegistry plugin)
@@ -47,7 +54,9 @@ const defaultComponents: Partial<Record<FieldDefinition['type'], Component>> = {
 function resolveComponent(field: FieldDefinition): Component | string | null {
   // priority: field.component > prop override > app registry > built-in defaults
   if (field.component) return field.component
-  return props.components?.[field.type] ?? registry[field.type] ?? defaultComponents[field.type] ?? null
+  return (
+    props.components?.[field.type] ?? registry[field.type] ?? defaultComponents[field.type] ?? null
+  )
 }
 
 // ─── Field value helpers ──────────────────────────────────────────────────────
@@ -77,7 +86,7 @@ function isTouched(field: FieldDefinition): boolean {
 // ─── Visible fields ───────────────────────────────────────────────────────────
 
 const visibleFields = computed(() =>
-  props.form.fields.value.filter((f) => f.visible !== false),
+  (props.fields ?? props.form.fields.value).filter((f) => f.visible !== false),
 )
 
 async function onSubmit(e: Event) {
@@ -108,6 +117,7 @@ async function onSubmit(e: Event) {
         <FormRenderer
           v-if="field.fields"
           :form="form"
+          :fields="field.fields"
           :components="components"
         />
       </fieldset>

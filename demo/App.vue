@@ -6,25 +6,32 @@ const Loading = defineComponent({
 })
 
 function asyncPage(loader: () => Promise<unknown>) {
-  return defineAsyncComponent({ loader: loader as () => Promise<{ default: object }>, loadingComponent: Loading })
+  return defineAsyncComponent({
+    loader: loader as () => Promise<{ default: object }>,
+    loadingComponent: Loading,
+  })
 }
 
 const pages = [
-  { id: 'basic',      label: 'Basic form',        icon: '📝', group: 'Examples' },
-  { id: 'json',       label: 'JSON schema',        icon: '🌐', group: 'Examples' },
-  { id: 'zod',        label: 'Zod schema',         icon: '🔷', group: 'Examples' },
-  { id: 'yup',        label: 'Yup schema',         icon: '🟡', group: 'Examples' },
-  { id: 'valibot',    label: 'Valibot schema',     icon: '🔶', group: 'Examples' },
+  { id: 'basic', label: 'Basic form', icon: '📝', group: 'Examples' },
+  { id: 'json', label: 'JSON schema', icon: '🌐', group: 'Examples' },
+  { id: 'openapi', label: 'OpenAPI / JSON Schema', icon: '📡', group: 'Examples' },
+  { id: 'zod', label: 'Zod schema', icon: '🔷', group: 'Examples' },
+  { id: 'yup', label: 'Yup schema', icon: '🟡', group: 'Examples' },
+  { id: 'valibot', label: 'Valibot schema', icon: '🔶', group: 'Examples' },
   { id: 'conditions', label: 'Conditional fields', icon: '👁️', group: 'Features' },
-  { id: 'masks',      label: 'Input masking',      icon: '🎭', group: 'Features' },
-  { id: 'renderer',   label: 'FormRenderer',       icon: '⚡', group: 'Features' },
-  { id: 'arrays',     label: 'Array fields',       icon: '📋', group: 'Features' },
-  { id: 'multistep',  label: 'Multi-step wizard',  icon: '🧭', group: 'Features' },
-  { id: 'dependent',  label: 'Dependent fields',   icon: '🔗', group: 'Features' },
-  { id: 'registry',   label: 'Custom registry',    icon: '🧩', group: 'Features' },
-  { id: 'fileupload', label: 'File upload',         icon: '📁', group: 'Features' },
-  { id: 'tailwind',   label: 'Tailwind theme',     icon: '🎨', group: 'Features' },
-  { id: 'a11y',       label: 'Accessibility',      icon: '♿', group: 'Features' },
+  { id: 'masks', label: 'Input masking', icon: '🎭', group: 'Features' },
+  { id: 'renderer', label: 'FormRenderer', icon: '⚡', group: 'Features' },
+  { id: 'arrays', label: 'Array fields', icon: '📋', group: 'Features' },
+  { id: 'multistep', label: 'Multi-step wizard', icon: '🧭', group: 'Features' },
+  { id: 'dependent', label: 'Dependent fields', icon: '🔗', group: 'Features' },
+  { id: 'discriminated', label: 'Discriminated schemas', icon: '🧬', group: 'Features' },
+  { id: 'registry', label: 'Custom registry', icon: '🧩', group: 'Features' },
+  { id: 'fileupload', label: 'File upload', icon: '📁', group: 'Features' },
+  { id: 'server-errors', label: 'Server-side errors', icon: '🖥️', group: 'Features' },
+  { id: 'tailwind', label: 'Tailwind theme', icon: '🎨', group: 'Features' },
+  { id: 'ui-themes', label: 'UI themes (shadcn/PrimeVue/Naive)', icon: '🧵', group: 'Features' },
+  { id: 'a11y', label: 'Accessibility', icon: '♿', group: 'Features' },
 ]
 
 const groups = [...new Set(pages.map((p) => p.group))]
@@ -32,21 +39,25 @@ const groups = [...new Set(pages.map((p) => p.group))]
 const active = ref('basic')
 
 const views: Record<string, ReturnType<typeof defineAsyncComponent>> = {
-  basic:      asyncPage(() => import('./examples/BasicForm.vue')),
-  json:       asyncPage(() => import('./examples/JsonSchemaForm.vue')),
-  zod:        asyncPage(() => import('./examples/ZodForm.vue')),
-  yup:        asyncPage(() => import('./examples/YupForm.vue')),
-  valibot:    asyncPage(() => import('./examples/ValibotForm.vue')),
+  basic: asyncPage(() => import('./examples/BasicForm.vue')),
+  json: asyncPage(() => import('./examples/JsonSchemaForm.vue')),
+  openapi: asyncPage(() => import('./examples/OpenAPIForm.vue')),
+  zod: asyncPage(() => import('./examples/ZodForm.vue')),
+  yup: asyncPage(() => import('./examples/YupForm.vue')),
+  valibot: asyncPage(() => import('./examples/ValibotForm.vue')),
   conditions: asyncPage(() => import('./examples/ConditionalForm.vue')),
-  masks:      asyncPage(() => import('./examples/MaskedForm.vue')),
-  renderer:   asyncPage(() => import('./examples/FormRendererDemo.vue')),
-  arrays:     asyncPage(() => import('./examples/ArrayDemo.vue')),
-  multistep:  asyncPage(() => import('./examples/MultiStepDemo.vue')),
-  dependent:  asyncPage(() => import('./examples/DependentFieldsDemo.vue')),
-  registry:   asyncPage(() => import('./examples/CustomRegistryDemo.vue')),
+  masks: asyncPage(() => import('./examples/MaskedForm.vue')),
+  renderer: asyncPage(() => import('./examples/FormRendererDemo.vue')),
+  arrays: asyncPage(() => import('./examples/ArrayDemo.vue')),
+  multistep: asyncPage(() => import('./examples/MultiStepDemo.vue')),
+  dependent: asyncPage(() => import('./examples/DependentFieldsDemo.vue')),
+  discriminated: asyncPage(() => import('./examples/DiscriminatedFieldsDemo.vue')),
+  registry: asyncPage(() => import('./examples/CustomRegistryDemo.vue')),
   fileupload: asyncPage(() => import('./examples/FileUploadDemo.vue')),
-  tailwind:   asyncPage(() => import('./examples/TailwindDemo.vue')),
-  a11y:       asyncPage(() => import('./examples/AccessibilityDemo.vue')),
+  'server-errors': asyncPage(() => import('./examples/ServerErrorsDemo.vue')),
+  tailwind: asyncPage(() => import('./examples/TailwindDemo.vue')),
+  'ui-themes': asyncPage(() => import('./examples/UIThemesDemo.vue')),
+  a11y: asyncPage(() => import('./examples/AccessibilityDemo.vue')),
 }
 </script>
 
@@ -60,16 +71,17 @@ const views: Record<string, ReturnType<typeof defineAsyncComponent>> = {
 
       <template v-for="group in groups" :key="group">
         <div class="nav-group-title">{{ group }}</div>
-        <div
-          v-for="page in pages.filter(p => p.group === group)"
+        <button
+          v-for="page in pages.filter((p) => p.group === group)"
           :key="page.id"
+          type="button"
           class="nav-item"
           :class="{ active: active === page.id }"
           @click="active = page.id"
         >
           <span class="nav-icon">{{ page.icon }}</span>
           {{ page.label }}
-        </div>
+        </button>
       </template>
     </aside>
 

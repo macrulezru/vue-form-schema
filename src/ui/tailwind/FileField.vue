@@ -67,9 +67,13 @@ function formatSize(bytes: number): string {
   <BaseField v-slot="aria" :field="field" :error="error" :touched="touched">
     <div
       class="relative rounded-lg border-2 border-dashed p-6 text-center transition"
-      :class="isDragging
-        ? 'border-indigo-500 bg-indigo-500/10'
-        : (touched && error?.length ? 'border-red-500 bg-red-500/5' : 'border-gray-700 bg-gray-900 hover:border-gray-500')"
+      :class="
+        isDragging
+          ? 'border-indigo-500 bg-indigo-500/10'
+          : touched && error?.length
+            ? 'border-red-500 bg-red-500/5'
+            : 'border-gray-700 bg-gray-900 hover:border-gray-500'
+      "
       @dragover.prevent="isDragging = true"
       @dragleave="isDragging = false"
       @drop="onDrop"

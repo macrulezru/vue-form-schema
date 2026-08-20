@@ -12,13 +12,16 @@ const schema: FieldDefinition[] = [
     name: 'members',
     label: 'Team members',
     fields: [
-      { type: 'text',   name: 'members.name',  label: 'Full name',   required: true },
-      { type: 'email',  name: 'members.email', label: 'Email',       required: true },
-      { type: 'select', name: 'members.role',  label: 'Role',
+      { type: 'text', name: 'name', label: 'Full name', required: true },
+      { type: 'email', name: 'email', label: 'Email', required: true },
+      {
+        type: 'select',
+        name: 'role',
+        label: 'Role',
         options: [
           { label: 'Developer', value: 'dev' },
-          { label: 'Designer',  value: 'design' },
-          { label: 'Manager',   value: 'mgr' },
+          { label: 'Designer', value: 'design' },
+          { label: 'Manager', value: 'mgr' },
         ],
       },
     ],
@@ -45,26 +48,28 @@ const memberArray = useFieldArray(form, 'members')
     <div class="page-header">
       <h2>Dynamic array fields</h2>
       <p>
-        Use <code>type: 'array'</code> in your schema or <code>useFieldArray</code> for
-        programmatic control — append, remove, move rows at runtime.
+        Use <code>type: 'array'</code> in your schema or <code>useFieldArray</code> for programmatic
+        control — append, remove, move rows at runtime.
       </p>
     </div>
 
     <!-- FormRenderer handles the array automatically -->
     <div class="card">
       <div class="card-title">FormRenderer with type: 'array'</div>
-      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:16px">
+      <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 16px">
         <code>FormRenderer</code> renders an <code>ArrayField</code> automatically for array fields.
         Each row renders the nested <code>fields</code> schema.
       </p>
       <FormRenderer :form="form" submit-label="Save project" />
-      <div v-if="submitted" class="toast">✅ Project saved with {{ (submitted.members as unknown[]).length }} member(s)</div>
+      <div v-if="submitted" class="toast">
+        ✅ Project saved with {{ (submitted.members as unknown[]).length }} member(s)
+      </div>
     </div>
 
     <!-- useFieldArray manual API -->
     <div class="card">
       <div class="card-title">useFieldArray programmatic API</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px">
         <button class="btn btn-ghost" @click="memberArray.append()">+ Append</button>
         <button class="btn btn-ghost" @click="memberArray.prepend()">Prepend</button>
         <button
@@ -82,7 +87,8 @@ const memberArray = useFieldArray(form, 'members')
           Remove last
         </button>
       </div>
-      <pre class="values-preview">count: {{ memberArray.count.value }}
+      <pre class="values-preview">
+count: {{ memberArray.count.value }}
 members: {{ JSON.stringify(form.values.value.members, null, 2) }}</pre>
     </div>
 
@@ -125,19 +131,72 @@ members: {{ JSON.stringify(form.values.value.members, null, 2) }}</pre>
   margin-top: 4px;
   transition: all 0.15s;
 }
-:deep(.vfs-array__add:hover) { color: var(--accent); border-color: var(--accent); }
-:deep(.vfs-field) { margin-bottom: 16px; }
-:deep(.vfs-field__label) { display: block; font-size: 0.8rem; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
-:deep(.vfs-field__required) { color: var(--error); margin-left: 2px; }
-:deep(.vfs-field__errors) { list-style: none; }
-:deep(.vfs-field__error) { font-size: 0.78rem; color: var(--error); margin-top: 4px; }
-:deep(.vfs-input), :deep(.vfs-textarea), :deep(.vfs-select) {
-  width: 100%; padding: 9px 12px; background: var(--code-bg);
-  border: 1px solid var(--border); border-radius: var(--radius);
-  color: var(--text); font-family: var(--font); font-size: 0.9rem; outline: none; transition: border-color 0.15s;
+:deep(.vfs-array__add:hover) {
+  color: var(--accent);
+  border-color: var(--accent);
 }
-:deep(.vfs-input:focus), :deep(.vfs-textarea:focus), :deep(.vfs-select:focus) { border-color: var(--accent); }
-:deep(.vfs-submit) { display: inline-flex; align-items: center; padding: 9px 20px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background 0.15s; margin-top: 8px; }
-:deep(.vfs-submit:hover:not(:disabled)) { background: var(--accent-h); }
-:deep(.vfs-submit:disabled) { opacity: 0.45; cursor: not-allowed; }
+:deep(.vfs-field) {
+  margin-bottom: 16px;
+}
+:deep(.vfs-field__label) {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+:deep(.vfs-field__required) {
+  color: var(--error);
+  margin-left: 2px;
+}
+:deep(.vfs-field__errors) {
+  list-style: none;
+}
+:deep(.vfs-field__error) {
+  font-size: 0.78rem;
+  color: var(--error);
+  margin-top: 4px;
+}
+:deep(.vfs-input),
+:deep(.vfs-textarea),
+:deep(.vfs-select) {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+:deep(.vfs-input:focus),
+:deep(.vfs-textarea:focus),
+:deep(.vfs-select:focus) {
+  border-color: var(--accent);
+}
+:deep(.vfs-submit) {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 20px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-top: 8px;
+}
+:deep(.vfs-submit:hover:not(:disabled)) {
+  background: var(--accent-h);
+}
+:deep(.vfs-submit:disabled) {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
 </style>

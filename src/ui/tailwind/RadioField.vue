@@ -16,9 +16,7 @@ const emit = defineEmits<{
 
 const hasError = computed(() => !!(props.touched && props.error?.length))
 const errorId = computed(() => `${props.field.name}-error`)
-const options = computed(() =>
-  Array.isArray(props.field.options) ? props.field.options : [],
-)
+const options = computed(() => (Array.isArray(props.field.options) ? props.field.options : []))
 </script>
 
 <template>
@@ -54,13 +52,7 @@ const options = computed(() =>
         <span class="text-sm text-gray-200">{{ opt.label }}</span>
       </label>
     </div>
-    <ul
-      v-if="hasError"
-      :id="errorId"
-      class="mt-1 space-y-0.5"
-      role="alert"
-      aria-live="polite"
-    >
+    <ul v-if="hasError" :id="errorId" class="mt-1 space-y-0.5" role="alert" aria-live="polite">
       <li v-for="(msg, i) in error" :key="i" class="text-red-400 text-xs">{{ msg }}</li>
     </ul>
   </fieldset>

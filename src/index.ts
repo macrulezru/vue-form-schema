@@ -11,6 +11,7 @@ export type {
   AsyncValidatorFn,
   UseFormConfig,
   UseFormReturn,
+  TypedFieldDefinitions,
   ValidateOn,
   ValidateMode,
   JSONSchema,
@@ -61,7 +62,22 @@ export {
 } from './core/ValidationEngine'
 
 // Schema composition utilities
-export { mergeSchemas, omitFields, pickFields, extendField } from './core/schemaUtils'
+export {
+  mergeSchemas,
+  omitFields,
+  pickFields,
+  extendField,
+  discriminatedFields,
+} from './core/schemaUtils'
+
+// Server-side validation error mapping
+export { applyServerErrors, normalizeServerErrors } from './core/serverErrors'
+export type {
+  NormalizedServerErrors,
+  ServerErrorFormat,
+  ServerErrorMapper,
+  ApplyServerErrorsOptions,
+} from './core/serverErrors'
 
 // TypeScript inference helpers
 export type { InferValues } from './core/inferTypes'

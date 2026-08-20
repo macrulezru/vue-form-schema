@@ -42,9 +42,11 @@ onUnmounted(() => cleanupMask?.())
       :required="field.required"
       v-bind="aria"
       class="w-full rounded-lg border bg-gray-900 px-3 py-2 text-sm text-gray-100 placeholder-gray-500 outline-none transition focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
-      :class="hasError
-        ? 'border-red-500 focus:ring-red-500'
-        : 'border-gray-700 focus:ring-indigo-500 focus:border-indigo-500'"
+      :class="
+        hasError
+          ? 'border-red-500 focus:ring-red-500'
+          : 'border-gray-700 focus:ring-indigo-500 focus:border-indigo-500'
+      "
       @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       @blur="emit('blur')"
     />

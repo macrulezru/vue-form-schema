@@ -41,10 +41,14 @@ describe('field.component — renders custom component', () => {
     const schema: FieldDefinition[] = [
       { type: 'text', name: 'username', label: 'Username', component: CustomTextInput },
     ]
-    const form = mount(defineComponent({
-      setup() { return useForm({ schema }) },
-      template: '<div/>',
-    }))
+    const form = mount(
+      defineComponent({
+        setup() {
+          return useForm({ schema })
+        },
+        template: '<div/>',
+      }),
+    )
     // FormRenderer is not used here — we verify that the component property is stored in the field.
     // Vue's reactivity wraps stored objects in Proxy, so compare by component name rather than identity.
     const comp = (form.vm.fields as unknown as FieldDefinition[])[0].component as { name: string }
@@ -55,13 +59,14 @@ describe('field.component — renders custom component', () => {
     const schema: FieldDefinition[] = [
       { type: 'text', name: 'name', required: true, component: CustomTextInput },
     ]
-    const wrapper = mount(defineComponent({
-      components: { CustomTextInput },
-      setup() {
-        const form = useForm({ schema, validateOn: 'input' })
-        return { form }
-      },
-      template: `
+    const wrapper = mount(
+      defineComponent({
+        components: { CustomTextInput },
+        setup() {
+          const form = useForm({ schema, validateOn: 'input' })
+          return { form }
+        },
+        template: `
         <div>
           <CustomTextInput
             :field="form.fields.value[0]"
@@ -72,7 +77,8 @@ describe('field.component — renders custom component', () => {
           />
         </div>
       `,
-    }))
+      }),
+    )
 
     const input = wrapper.find('[data-testid="custom-input"]')
     expect(input.exists()).toBe(true)
@@ -86,13 +92,14 @@ describe('field.component — renders custom component', () => {
     const schema: FieldDefinition[] = [
       { type: 'text', name: 'name', required: true, component: CustomTextInput },
     ]
-    const wrapper = mount(defineComponent({
-      components: { CustomTextInput },
-      setup() {
-        const form = useForm({ schema })
-        return { form }
-      },
-      template: `
+    const wrapper = mount(
+      defineComponent({
+        components: { CustomTextInput },
+        setup() {
+          const form = useForm({ schema })
+          return { form }
+        },
+        template: `
         <div>
           <CustomTextInput
             :field="form.fields.value[0]"
@@ -102,7 +109,8 @@ describe('field.component — renders custom component', () => {
           />
         </div>
       `,
-    }))
+      }),
+    )
 
     // No error before submit
     expect(wrapper.find('[data-testid="custom-error"]').exists()).toBe(false)
@@ -127,10 +135,14 @@ describe('useFormField helper', () => {
       touched: false,
       ...props,
     }
-    return mount(defineComponent({
-      setup() { return useFormField(merged) },
-      template: '<div/>',
-    }))
+    return mount(
+      defineComponent({
+        setup() {
+          return useFormField(merged)
+        },
+        template: '<div/>',
+      }),
+    )
   }
 
   it('hasError is false when not touched', () => {
@@ -165,12 +177,14 @@ describe('useFormField helper', () => {
 
   it('isDisabled reflects field.disabled', () => {
     const field: FieldDefinition = { type: 'text', name: 'x', disabled: true }
-    const w = mount(defineComponent({
-      setup() {
-        return useFormField({ field, modelValue: null, error: [], touched: false })
-      },
-      template: '<div/>',
-    }))
+    const w = mount(
+      defineComponent({
+        setup() {
+          return useFormField({ field, modelValue: null, error: [], touched: false })
+        },
+        template: '<div/>',
+      }),
+    )
     expect(w.vm.isDisabled).toBe(true)
   })
 })
@@ -188,10 +202,14 @@ describe('defaultValue as function', () => {
         defaultValue: (values: Record<string, unknown>) => `${values.first} ${values.last}`,
       },
     ]
-    const w = mount(defineComponent({
-      setup() { return useForm({ schema }) },
-      template: '<div/>',
-    }))
+    const w = mount(
+      defineComponent({
+        setup() {
+          return useForm({ schema })
+        },
+        template: '<div/>',
+      }),
+    )
     expect(w.vm.values.full).toBe('John Doe')
   })
 
@@ -199,10 +217,14 @@ describe('defaultValue as function', () => {
     const schema: FieldDefinition[] = [
       { type: 'text', name: 'name', defaultValue: () => 'computed' },
     ]
-    const w = mount(defineComponent({
-      setup() { return useForm({ schema, initialValues: { name: 'override' } as never }) },
-      template: '<div/>',
-    }))
+    const w = mount(
+      defineComponent({
+        setup() {
+          return useForm({ schema, initialValues: { name: 'override' } as never })
+        },
+        template: '<div/>',
+      }),
+    )
     expect(w.vm.values.name).toBe('override')
   })
 })

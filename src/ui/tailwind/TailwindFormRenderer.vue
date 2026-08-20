@@ -19,6 +19,13 @@ const props = defineProps<{
   form: UseFormReturn
   components?: Partial<Record<FieldDefinition['type'], Component | string>>
   submitLabel?: string
+  /**
+   * Internal: the field list to render. Used by the `group` case to recurse
+   * into `field.fields` instead of re-rendering the whole top-level schema
+   * (which would recurse into the same group forever). Defaults to the
+   * form's top-level fields — not meant to be passed by consumers.
+   */
+  fields?: FieldDefinition[]
 }>()
 
 const registry = useRegistry()
@@ -41,7 +48,9 @@ const defaultComponents: Partial<Record<FieldDefinition['type'], Component>> = {
 
 function resolveComponent(field: FieldDefinition): Component | string | null {
   if (field.component) return field.component
-  return props.components?.[field.type] ?? registry[field.type] ?? defaultComponents[field.type] ?? null
+  return (
+    props.components?.[field.type] ?? registry[field.type] ?? defaultComponents[field.type] ?? null
+  )
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -49,15 +58,23 @@ function resolveComponent(field: FieldDefinition): Component | string | null {
 function getValue(field: FieldDefinition) {
   return getByPath(props.form.values.value as Record<string, unknown>, field.name)
 }
-function setValue(field: FieldDefinition, value: unknown) { props.form.setField(field.name, value) }
+function setValue(field: FieldDefinition, value: unknown) {
+  props.form.setField(field.name, value)
+}
 function touchField(field: FieldDefinition) {
   const form = props.form as UseFormReturn & { touchField?: (p: string) => void }
   form.touchField?.(field.name)
 }
-function getErrors(field: FieldDefinition): string[] { return props.form.errors.value[field.name] ?? [] }
-function isTouched(field: FieldDefinition): boolean { return props.form.touched.value[field.name] ?? false }
+function getErrors(field: FieldDefinition): string[] {
+  return props.form.errors.value[field.name] ?? []
+}
+function isTouched(field: FieldDefinition): boolean {
+  return props.form.touched.value[field.name] ?? false
+}
 
-const visibleFields = computed(() => props.form.fields.value.filter((f) => f.visible !== false))
+const visibleFields = computed(() =>
+  (props.fields ?? props.form.fields.value).filter((f) => f.visible !== false),
+)
 
 async function onSubmit(e: Event) {
   e.preventDefault()
@@ -82,11 +99,22 @@ async function onSubmit(e: Event) {
       />
 
       <!-- group -->
-      <fieldset v-else-if="field.type === 'group'" class="mb-4 rounded-lg border border-gray-700 p-4">
-        <legend v-if="field.label" class="px-1 text-xs font-semibold uppercase tracking-wider text-gray-400">
+      <fieldset
+        v-else-if="field.type === 'group'"
+        class="mb-4 rounded-lg border border-gray-700 p-4"
+      >
+        <legend
+          v-if="field.label"
+          class="px-1 text-xs font-semibold uppercase tracking-wider text-gray-400"
+        >
           {{ field.label }}
         </legend>
-        <TailwindFormRenderer v-if="field.fields" :form="form" :components="components" />
+        <TailwindFormRenderer
+          v-if="field.fields"
+          :form="form"
+          :fields="field.fields"
+          :components="components"
+        />
       </fieldset>
 
       <!-- array -->

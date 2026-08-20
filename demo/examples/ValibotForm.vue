@@ -6,10 +6,10 @@ import { useForm } from 'vue-form-schema'
 
 const schema = v.object({
   fullName: v.pipe(v.string(), v.minLength(2, 'At least 2 characters')),
-  email:    v.pipe(v.string(), v.email('Invalid email address')),
-  age:      v.optional(v.pipe(v.number(), v.minValue(18, 'Must be 18 or older'))),
-  role:     v.picklist(['developer', 'designer', 'manager']),
-  agree:    v.literal(true),
+  email: v.pipe(v.string(), v.email('Invalid email address')),
+  age: v.optional(v.pipe(v.number(), v.minValue(18, 'Must be 18 or older'))),
+  role: v.picklist(['developer', 'designer', 'manager']),
+  agree: v.literal(true),
 })
 
 const schemaCode = `import * as v from 'valibot'
@@ -32,19 +32,19 @@ const rawFields = parseValibot(schema)
 
 const labels: Record<string, string> = {
   fullName: 'Full name',
-  email:    'Email',
-  age:      'Age (18+)',
-  role:     'Role',
-  agree:    'I agree to the terms of service',
+  email: 'Email',
+  age: 'Age (18+)',
+  role: 'Role',
+  agree: 'I agree to the terms of service',
 }
 
 const roleOptions = [
   { label: 'Developer', value: 'developer' },
-  { label: 'Designer',  value: 'designer'  },
-  { label: 'Manager',   value: 'manager'   },
+  { label: 'Designer', value: 'designer' },
+  { label: 'Manager', value: 'manager' },
 ]
 
-const fields = rawFields.map(f => ({
+const fields = rawFields.map((f) => ({
   ...f,
   label: labels[f.name],
   ...(f.name === 'role' ? { options: roleOptions } : {}),
@@ -61,8 +61,12 @@ const { values, errors, touched, isSubmitting, submit, reset, setField } = useFo
   },
 })
 
-function touch(name: string) { touched.value[name] = true }
-function hasError(name: string) { return touched.value[name] && errors.value[name]?.length }
+function touch(name: string) {
+  touched.value[name] = true
+}
+function hasError(name: string) {
+  return touched.value[name] && errors.value[name]?.length
+}
 </script>
 
 <template>
@@ -70,9 +74,8 @@ function hasError(name: string) { return touched.value[name] && errors.value[nam
     <div class="page-header">
       <h2>Valibot schema <span class="badge badge-valibot">Valibot</span></h2>
       <p>
-        Define your schema with Valibot and pass it through <code>parseValibot()</code>.
-        Unlike Zod, Valibot has no <code>.describe()</code> — labels are added manually
-        after parsing.
+        Define your schema with Valibot and pass it through <code>parseValibot()</code>. Unlike Zod,
+        Valibot has no <code>.describe()</code> — labels are added manually after parsing.
       </p>
     </div>
 
@@ -109,7 +112,7 @@ function hasError(name: string) { return touched.value[name] && errors.value[nam
         </div>
 
         <div class="field">
-          <label>Age (18+) <span style="color:var(--muted)">(optional)</span></label>
+          <label>Age (18+) <span style="color: var(--muted)">(optional)</span></label>
           <input
             type="number"
             :value="values.age ?? ''"
@@ -129,8 +132,12 @@ function hasError(name: string) { return touched.value[name] && errors.value[nam
             @blur="touch('role')"
           >
             <option value="" disabled :selected="!values.role">Select a role</option>
-            <option v-for="opt in roleOptions" :key="opt.value"
-              :value="opt.value" :selected="values.role === opt.value">
+            <option
+              v-for="opt in roleOptions"
+              :key="opt.value"
+              :value="opt.value"
+              :selected="values.role === opt.value"
+            >
               {{ opt.label }}
             </option>
           </select>
@@ -166,7 +173,13 @@ function hasError(name: string) { return touched.value[name] && errors.value[nam
 
     <div class="card">
       <div class="card-title">Parsed fields from Valibot</div>
-      <pre class="values-preview">{{ JSON.stringify(fields.map(f => ({ name: f.name, type: f.type, label: f.label, required: f.required })), null, 2) }}</pre>
+      <pre class="values-preview">{{
+        JSON.stringify(
+          fields.map((f) => ({ name: f.name, type: f.type, label: f.label, required: f.required })),
+          null,
+          2,
+        )
+      }}</pre>
     </div>
   </div>
 </template>

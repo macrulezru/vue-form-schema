@@ -43,9 +43,9 @@ const schema: FieldDefinition[] = [
     options: [
       { label: 'United States', value: 'us' },
       { label: 'United Kingdom', value: 'uk' },
-      { label: 'Germany',        value: 'de' },
-      { label: 'France',         value: 'fr' },
-      { label: 'Russia',         value: 'ru' },
+      { label: 'Germany', value: 'de' },
+      { label: 'France', value: 'fr' },
+      { label: 'Russia', value: 'ru' },
     ],
   },
   {
@@ -66,14 +66,15 @@ const schema: FieldDefinition[] = [
 
 const submitted = ref<Record<string, unknown> | null>(null)
 
-const { values, errors, touched, isDirty, isValid, isSubmitting, submit, reset, setField } = useForm({
-  schema,
-  validateOn: 'blur',
-  onSubmit: async (data) => {
-    await new Promise((r) => setTimeout(r, 800))
-    submitted.value = data
-  },
-})
+const { values, errors, touched, isDirty, isValid, isSubmitting, submit, reset, setField } =
+  useForm({
+    schema,
+    validateOn: 'blur',
+    onSubmit: async (data) => {
+      await new Promise((r) => setTimeout(r, 800))
+      submitted.value = data
+    },
+  })
 
 function touch(name: string) {
   touched.value[name] = true
@@ -96,9 +97,18 @@ function hasError(name: string) {
     </div>
 
     <div class="status-bar">
-      <span><span class="dot" :class="isDirty ? 'dot-yellow' : 'dot-green'" /> {{ isDirty ? 'Dirty' : 'Pristine' }}</span>
-      <span><span class="dot" :class="isValid ? 'dot-green' : 'dot-red'" /> {{ isValid ? 'Valid' : 'Invalid' }}</span>
-      <span><span class="dot" :class="isSubmitting ? 'dot-yellow' : 'dot-green'" /> {{ isSubmitting ? 'Submitting…' : 'Idle' }}</span>
+      <span
+        ><span class="dot" :class="isDirty ? 'dot-yellow' : 'dot-green'" />
+        {{ isDirty ? 'Dirty' : 'Pristine' }}</span
+      >
+      <span
+        ><span class="dot" :class="isValid ? 'dot-green' : 'dot-red'" />
+        {{ isValid ? 'Valid' : 'Invalid' }}</span
+      >
+      <span
+        ><span class="dot" :class="isSubmitting ? 'dot-yellow' : 'dot-green'" />
+        {{ isSubmitting ? 'Submitting…' : 'Idle' }}</span
+      >
     </div>
 
     <div class="card">
@@ -162,8 +172,12 @@ function hasError(name: string) {
             @blur="touch('country')"
           >
             <option value="" disabled :selected="!values.country">Select a country</option>
-            <option v-for="opt in schema[4].options" :key="String(opt.value)"
-              :value="opt.value" :selected="values.country === opt.value">
+            <option
+              v-for="opt in schema[4].options"
+              :key="String(opt.value)"
+              :value="opt.value"
+              :selected="values.country === opt.value"
+            >
               {{ opt.label }}
             </option>
           </select>

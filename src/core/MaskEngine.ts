@@ -5,9 +5,9 @@ import type { MaskConfig, MaskPreset } from './types'
 const PRESETS: Record<MaskPreset, string> = {
   'phone-ru': '+7 (###) ###-##-##',
   'phone-eu': '+## (##) ###-##-##',
-  'date': '##.##.####',
-  'inn': '############',
-  'iban': 'AA## #### #### #### #### #### ####',
+  date: '##.##.####',
+  inn: '############',
+  iban: 'AA## #### #### #### #### #### ####',
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -118,10 +118,7 @@ export function removeMask(value: string, mask: string | MaskConfig): string {
  * Attach mask handling to a native <input> element.
  * Returns a cleanup function.
  */
-export function bindMask(
-  input: HTMLInputElement,
-  mask: string | MaskConfig,
-): () => void {
+export function bindMask(input: HTMLInputElement, mask: string | MaskConfig): () => void {
   function onInput() {
     const raw = removeMask(input.value, mask)
     const masked = applyMask(raw, mask)

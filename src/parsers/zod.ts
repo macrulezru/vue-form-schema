@@ -4,7 +4,12 @@
  * is not bloated when Zod is not used.
  */
 
-import type { FieldDefinition, ValidatorFn } from '../core/types'
+import type { FieldDefinition, TypedFieldDefinitions, ValidatorFn } from '../core/types'
+import { discriminatedFields } from '../core/schemaUtils'
+// Type-only import — does not pull Zod into the runtime bundle (Zod stays an
+// optional peer dependency). Used solely so `parseZod`'s return type can
+// carry the schema's inferred value type through to `useForm`.
+import type { z } from 'zod'
 
 // Minimal Zod type surface we need (avoid importing zod types at build time).
 // All optional message fields use `string | undefined` so the type is
@@ -16,7 +21,11 @@ type ZodTypeAny = any
 
 function zodTypeName(schema: ZodTypeAny): string {
   let def = schema._def
-  while (def.typeName === 'ZodOptional' || def.typeName === 'ZodNullable' || def.typeName === 'ZodDefault') {
+  while (
+    def.typeName === 'ZodOptional' ||
+    def.typeName === 'ZodNullable' ||
+    def.typeName === 'ZodDefault'
+  ) {
     def = def.innerType?._def ?? def
     break
   }
@@ -26,13 +35,20 @@ function zodTypeName(schema: ZodTypeAny): string {
 function zodToFieldType(schema: ZodTypeAny): FieldDefinition['type'] {
   const name = zodTypeName(schema)
   switch (name) {
-    case 'ZodString': return 'text'
-    case 'ZodNumber': return 'number'
-    case 'ZodBoolean': return 'checkbox'
-    case 'ZodArray': return 'array'
-    case 'ZodObject': return 'group'
-    case 'ZodEnum': return 'select'
-    default: return 'text'
+    case 'ZodString':
+      return 'text'
+    case 'ZodNumber':
+      return 'number'
+    case 'ZodBoolean':
+      return 'checkbox'
+    case 'ZodArray':
+      return 'array'
+    case 'ZodObject':
+      return 'group'
+    case 'ZodEnum':
+      return 'select'
+    default:
+      return 'text'
   }
 }
 
@@ -53,25 +69,36 @@ function zodToValidators(schema: ZodTypeAny, required: boolean): ValidatorFn[] {
       case 'min':
         validators.push((v) => {
           if (typeof v !== 'string') return null
-          return v.length >= Number(check.value) ? null : (check.message ?? `Minimum length is ${check.value}`)
+          return v.length >= Number(check.value)
+            ? null
+            : (check.message ?? `Minimum length is ${check.value}`)
         })
         break
       case 'max':
         validators.push((v) => {
           if (typeof v !== 'string') return null
-          return v.length <= Number(check.value) ? null : (check.message ?? `Maximum length is ${check.value}`)
+          return v.length <= Number(check.value)
+            ? null
+            : (check.message ?? `Maximum length is ${check.value}`)
         })
         break
       case 'email':
         validators.push((v) => {
           if (!v) return null
-          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v)) ? null : (check.message ?? 'Invalid email address')
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v))
+            ? null
+            : (check.message ?? 'Invalid email address')
         })
         break
       case 'url':
         validators.push((v) => {
           if (!v) return null
-          try { new URL(String(v)); return null } catch { return check.message ?? 'Invalid URL' }
+          try {
+            new URL(String(v))
+            return null
+          } catch {
+            return check.message ?? 'Invalid URL'
+          }
         })
         break
       case 'regex':
@@ -107,9 +134,7 @@ function convertZodField(name: string, schema: ZodTypeAny): FieldDefinition {
       name,
       label,
       required: !isOptional,
-      fields: Object.entries(shape).map(([key, child]) =>
-        convertZodField(`${name}.${key}`, child),
-      ),
+      fields: Object.entries(shape).map(([key, child]) => convertZodField(`${name}.${key}`, child)),
     }
   }
 
@@ -134,12 +159,86 @@ function convertZodField(name: string, schema: ZodTypeAny): FieldDefinition {
   }
 }
 
+// ─── Discriminated unions ─────────────────────────────────────────────────────
+
+/**
+ * Converts a `z.discriminatedUnion(key, [...])` into a flat `FieldDefinition[]`:
+ * a `select` field for the discriminator (options built from each variant's
+ * literal discriminator value) followed by every variant's own fields, each
+ * wired via `discriminatedFields` so only the fields matching the current
+ * discriminator value are visible.
+ */
+function convertZodDiscriminatedUnion(schema: ZodTypeAny): FieldDefinition[] {
+  const def = schema._def as { discriminator: string; options: ZodTypeAny[] }
+  const discriminatorName = def.discriminator
+
+  function variantKey(optionSchema: ZodTypeAny): string {
+    const shape = optionSchema._def.shape?.() ?? {}
+    const literal = shape[discriminatorName]
+    return String(literal?._def?.value)
+  }
+
+  const discriminatorField: FieldDefinition = {
+    type: 'select',
+    name: discriminatorName,
+    label: discriminatorName,
+    required: true,
+    options: def.options.map((optionSchema) => {
+      const key = variantKey(optionSchema)
+      return { label: key, value: key }
+    }),
+  }
+
+  const variants: Record<string, FieldDefinition[]> = {}
+  for (const optionSchema of def.options) {
+    const shape = optionSchema._def.shape?.() ?? {}
+    variants[variantKey(optionSchema)] = Object.entries(shape)
+      .filter(([key]) => key !== discriminatorName)
+      .map(([name, child]) => convertZodField(name, child))
+  }
+
+  return [discriminatorField, ...discriminatedFields(discriminatorName, variants)]
+}
+
 // ─── Public API ───────────────────────────────────────────────────────────────
 
-export function parseZod(schema: ZodTypeAny): FieldDefinition[] {
-  if (schema._def.typeName !== 'ZodObject') {
-    throw new Error('[vue-form-schema] parseZod expects a ZodObject schema')
+/**
+ * Parses a `z.object({...})` schema into a `FieldDefinition[]`.
+ *
+ * The return type carries the schema's inferred value type (`z.infer<S>`),
+ * so `useForm({ schema: parseZod(mySchema) })` picks up fully typed
+ * `values`/`errors`/`onSubmit` without an explicit `useForm<Values>(...)`.
+ */
+export function parseZod<S extends z.ZodObject<z.ZodRawShape>>(
+  schema: S,
+): TypedFieldDefinitions<z.infer<S>>
+/**
+ * Parses a `z.discriminatedUnion(key, [...])` schema into a `FieldDefinition[]`
+ * — a `select` for the discriminator plus every variant's fields, each only
+ * visible while the discriminator matches its variant (see
+ * `discriminatedFields`). Combine with `clearOnHide: true` on `useForm` so
+ * switching variants resets the now-hidden variant's values.
+ */
+export function parseZod<
+  Discriminator extends string,
+  Options extends readonly z.ZodDiscriminatedUnionOption<Discriminator>[],
+>(
+  schema: z.ZodDiscriminatedUnion<Discriminator, Options>,
+): TypedFieldDefinitions<z.infer<z.ZodDiscriminatedUnion<Discriminator, Options>>>
+export function parseZod(schema: ZodTypeAny): TypedFieldDefinitions<unknown> {
+  const zSchema = schema as ZodTypeAny
+
+  if (zSchema._def.typeName === 'ZodDiscriminatedUnion') {
+    return convertZodDiscriminatedUnion(zSchema) as TypedFieldDefinitions<unknown>
   }
-  const shape = schema._def.shape?.() ?? {}
-  return Object.entries(shape).map(([name, field]) => convertZodField(name, field))
+
+  if (zSchema._def.typeName !== 'ZodObject') {
+    throw new Error(
+      '[vue-form-schema] parseZod expects a ZodObject or ZodDiscriminatedUnion schema',
+    )
+  }
+  const shape = zSchema._def.shape?.() ?? {}
+  return Object.entries(shape).map(([name, field]) =>
+    convertZodField(name, field),
+  ) as TypedFieldDefinitions<unknown>
 }

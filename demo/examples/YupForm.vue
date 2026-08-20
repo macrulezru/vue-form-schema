@@ -5,11 +5,11 @@ import { parseYup } from 'vue-form-schema/yup'
 import { useForm } from 'vue-form-schema'
 
 const schema = yup.object({
-  fullName:  yup.string().min(2, 'At least 2 characters').required().label('Full name'),
-  email:     yup.string().email('Invalid email').required().label('Email'),
-  age:       yup.number().min(18, 'Must be 18 or older').max(120).optional().label('Age'),
-  bio:       yup.string().max(200, 'Max 200 characters').optional().label('Bio'),
-  agree:     yup.boolean().oneOf([true], 'You must agree').required().label('Agreement'),
+  fullName: yup.string().min(2, 'At least 2 characters').required().label('Full name'),
+  email: yup.string().email('Invalid email').required().label('Email'),
+  age: yup.number().min(18, 'Must be 18 or older').max(120).optional().label('Age'),
+  bio: yup.string().max(200, 'Max 200 characters').optional().label('Bio'),
+  agree: yup.boolean().oneOf([true], 'You must agree').required().label('Agreement'),
 })
 
 const schemaCode = `const schema = yup.object({
@@ -33,8 +33,12 @@ const { values, errors, touched, isSubmitting, submit, reset, setField } = useFo
   },
 })
 
-function touch(name: string) { touched.value[name] = true }
-function hasError(name: string) { return touched.value[name] && errors.value[name]?.length }
+function touch(name: string) {
+  touched.value[name] = true
+}
+function hasError(name: string) {
+  return touched.value[name] && errors.value[name]?.length
+}
 </script>
 
 <template>
@@ -42,8 +46,8 @@ function hasError(name: string) { return touched.value[name] && errors.value[nam
     <div class="page-header">
       <h2>Yup schema <span class="badge badge-yup">Yup</span></h2>
       <p>
-        Define your schema with Yup and pass it through <code>parseYup()</code>.
-        Yup's built-in validations are delegated to <code>validateSync()</code>
+        Define your schema with Yup and pass it through <code>parseYup()</code>. Yup's built-in
+        validations are delegated to <code>validateSync()</code>
         so all constraints are honoured automatically.
       </p>
     </div>
@@ -81,7 +85,7 @@ function hasError(name: string) { return touched.value[name] && errors.value[nam
         </div>
 
         <div class="field">
-          <label>Age <span style="color:var(--muted)">(18+)</span></label>
+          <label>Age <span style="color: var(--muted)">(18+)</span></label>
           <input
             type="number"
             :value="values.age ?? ''"
@@ -94,7 +98,7 @@ function hasError(name: string) { return touched.value[name] && errors.value[nam
         </div>
 
         <div class="field">
-          <label>Bio <span style="color:var(--muted)">(optional)</span></label>
+          <label>Bio <span style="color: var(--muted)">(optional)</span></label>
           <textarea
             :value="values.bio ?? ''"
             placeholder="A few words about you…"

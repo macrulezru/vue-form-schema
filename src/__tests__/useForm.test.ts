@@ -18,7 +18,11 @@ function mountForm(config: Parameters<typeof useForm>[0]) {
 
 const basicFields: FieldDefinition[] = [
   { type: 'text', name: 'name', required: true },
-  { type: 'email', name: 'email', validators: [(v) => (/\S+@\S+/.test(String(v)) ? null : 'Bad email')] },
+  {
+    type: 'email',
+    name: 'email',
+    validators: [(v) => (/\S+@\S+/.test(String(v)) ? null : 'Bad email')],
+  },
 ]
 
 describe('useForm — initial state', () => {
@@ -65,14 +69,51 @@ describe('useForm — setField / getField', () => {
   })
 
   it('setField on nested path', async () => {
-    const fields: FieldDefinition[] = [{
-      type: 'group', name: 'addr',
-      fields: [{ type: 'text', name: 'addr.city' }],
-    }]
+    const fields: FieldDefinition[] = [
+      {
+        type: 'group',
+        name: 'addr',
+        fields: [{ type: 'text', name: 'addr.city' }],
+      },
+    ]
     const wrapper = mountForm({ schema: fields })
     wrapper.vm.setField('addr.city', 'Moscow')
     await nextTick()
     expect(wrapper.vm.getField('addr.city')).toBe('Moscow')
+  })
+
+  it('seeds a nested group field default without any setField call', () => {
+    // Regression: buildInitialValues used to store group children under a
+    // flat "addr.city" key while getField/getByPath do real nested
+    // traversal (values.addr.city) — the default was invisible until the
+    // user typed something, which also silently dropped defaultValue for
+    // group fields.
+    const fields: FieldDefinition[] = [
+      {
+        type: 'group',
+        name: 'addr',
+        fields: [{ type: 'text', name: 'addr.city', defaultValue: 'Berlin' }],
+      },
+    ]
+    const wrapper = mountForm({ schema: fields })
+    expect(wrapper.vm.getField('addr.city')).toBe('Berlin')
+    // and the value is really nested, not a flat "addr.city" key
+    expect((wrapper.vm.values as unknown as { addr?: { city?: string } }).addr?.city).toBe('Berlin')
+  })
+
+  it('applies a nested initialValues override for a group field', () => {
+    const fields: FieldDefinition[] = [
+      {
+        type: 'group',
+        name: 'addr',
+        fields: [{ type: 'text', name: 'addr.city' }],
+      },
+    ]
+    const wrapper = mountForm({
+      schema: fields,
+      initialValues: { addr: { city: 'Paris' } } as never,
+    })
+    expect(wrapper.vm.getField('addr.city')).toBe('Paris')
   })
 })
 
@@ -177,15 +218,17 @@ describe('useForm — isValid', () => {
 })
 
 describe('useForm — validateMode', () => {
-  const multiValidatorField: FieldDefinition[] = [{
-    type: 'text',
-    name: 'pass',
-    required: true,
-    validators: [
-      (v) => (String(v).length >= 8 ? null : 'Min 8 chars'),
-      (v) => (/[A-Z]/.test(String(v)) ? null : 'Need uppercase'),
-    ],
-  }]
+  const multiValidatorField: FieldDefinition[] = [
+    {
+      type: 'text',
+      name: 'pass',
+      required: true,
+      validators: [
+        (v) => (String(v).length >= 8 ? null : 'Min 8 chars'),
+        (v) => (/[A-Z]/.test(String(v)) ? null : 'Need uppercase'),
+      ],
+    },
+  ]
 
   it('mode=first returns only first error', async () => {
     const wrapper = mountForm({ schema: multiValidatorField, validateMode: 'first' })
@@ -220,6 +263,47 @@ describe('useForm — validateOn=eager', () => {
     wrapper.vm.setField('name', '')
     await nextTick()
     expect(wrapper.vm.errors['name']).toBeTruthy()
+  })
+})
+
+describe('useForm — async validators', () => {
+  const schemaWithAsync: FieldDefinition[] = [
+    {
+      type: 'text',
+      name: 'username',
+      required: true,
+      asyncValidators: [async (v) => (v === 'taken' ? 'Username is taken' : null)],
+    },
+  ]
+
+  it('blocks submit while an async validator fails', async () => {
+    const onSubmit = vi.fn()
+    const wrapper = mountForm({
+      schema: schemaWithAsync,
+      initialValues: { username: 'taken' } as never,
+      onSubmit,
+    })
+    await wrapper.vm.submit()
+    expect(onSubmit).not.toHaveBeenCalled()
+    expect(wrapper.vm.errors['username']).toContain('Username is taken')
+  })
+
+  it('allows submit once the async validator passes', async () => {
+    const onSubmit = vi.fn()
+    const wrapper = mountForm({
+      schema: schemaWithAsync,
+      initialValues: { username: 'free' } as never,
+      onSubmit,
+    })
+    await wrapper.vm.submit()
+    expect(onSubmit).toHaveBeenCalledWith({ username: 'free' })
+  })
+
+  it('isValid is false while a known async error is present', async () => {
+    const wrapper = mountForm({ schema: schemaWithAsync, validateOn: 'input' })
+    wrapper.vm.setField('username', 'taken')
+    await wrapper.vm.submit()
+    expect(wrapper.vm.isValid).toBe(false)
   })
 })
 

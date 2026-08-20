@@ -2,10 +2,7 @@ import type { Component } from 'vue'
 
 // ─── Validator types ──────────────────────────────────────────────────────────
 
-export type ValidatorFn = (
-  value: unknown,
-  values: Record<string, unknown>,
-) => string | null
+export type ValidatorFn = (value: unknown, values: Record<string, unknown>) => string | null
 
 export type AsyncValidatorFn = (
   value: unknown,
@@ -14,12 +11,7 @@ export type AsyncValidatorFn = (
 
 // ─── Mask ─────────────────────────────────────────────────────────────────────
 
-export type MaskPreset =
-  | 'phone-ru'
-  | 'phone-eu'
-  | 'date'
-  | 'inn'
-  | 'iban'
+export type MaskPreset = 'phone-ru' | 'phone-eu' | 'date' | 'inn' | 'iban'
 
 export interface MaskConfig {
   preset?: MaskPreset
@@ -65,7 +57,8 @@ export interface FieldDefinition {
   asyncValidators?: AsyncValidatorFn[]
   mask?: string | MaskConfig
   /** For select / radio — static list, sync function, or async function */
-  options?: FieldOption[] | ((values: Record<string, unknown>) => FieldOption[] | Promise<FieldOption[]>)
+  options?:
+    FieldOption[] | ((values: Record<string, unknown>) => FieldOption[] | Promise<FieldOption[]>)
   /**
    * Field names whose values trigger re-fetching of async options.
    * Only relevant when `options` is an async function.
@@ -129,6 +122,19 @@ export interface JSONSchemaField {
 
 export type JSONSchema = JSONSchemaField[]
 
+// ─── Adapter-parser type inference brand ──────────────────────────────────────
+
+/**
+ * A `FieldDefinition[]` returned by a schema adapter (`parseZod` / `parseYup`
+ * / `parseValibot`) that also carries the source schema's inferred value
+ * type at the type level. `useForm({ schema: parseZod(mySchema) })` then
+ * infers `T` automatically — no `useForm<Values>(...)` needed.
+ *
+ * `__inferredValues` does not exist at runtime; it is a type-only marker
+ * erased by the compiler.
+ */
+export type TypedFieldDefinitions<T> = FieldDefinition[] & { readonly __inferredValues?: T }
+
 // ─── useForm config ───────────────────────────────────────────────────────────
 
 export type ValidateOn = 'input' | 'blur' | 'submit' | 'eager'
@@ -174,11 +180,4 @@ export interface UseFormReturn<T extends Record<string, unknown> = Record<string
 // ─── Built-in validator rule names ───────────────────────────────────────────
 
 export type BuiltinRule =
-  | 'required'
-  | 'minLength'
-  | 'maxLength'
-  | 'min'
-  | 'max'
-  | 'pattern'
-  | 'email'
-  | 'url'
+  'required' | 'minLength' | 'maxLength' | 'min' | 'max' | 'pattern' | 'email' | 'url'
