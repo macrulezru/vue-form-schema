@@ -51,7 +51,10 @@ const dateValue = computed(() => parseIsoDate(props.modelValue))
       :disabled="field.disabled === true"
       fluid
       v-bind="aria"
-      @update:model-value="(v) => emit('update:modelValue', toIsoDate(v))"
+      @update:model-value="
+        (v: Date | Date[] | (Date | null)[] | null | undefined) =>
+          emit('update:modelValue', toIsoDate(v))
+      "
       @blur="emit('blur')"
     />
   </BaseField>

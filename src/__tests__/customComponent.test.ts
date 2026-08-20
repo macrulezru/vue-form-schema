@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick, h } from 'vue'
+import { defineComponent, nextTick } from 'vue'
 import { useForm } from '../core/useForm'
 import { useFormField } from '../core/useFormField'
 import type { FieldDefinition, FormFieldProps } from '../core/types'

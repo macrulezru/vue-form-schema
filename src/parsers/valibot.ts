@@ -6,7 +6,6 @@ import { discriminatedFields } from '../core/schemaUtils'
 import type { GenericSchema, InferOutput } from 'valibot'
 
 // Using `any` to avoid build-time Valibot import (peer dependency is optional)
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ValibotSchema = any
 
 /**

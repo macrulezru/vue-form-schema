@@ -20,8 +20,7 @@ const schemaCode = `const schema = yup.object({
   agree:    yup.boolean().oneOf([true]).required().label('Agreement'),
 })`
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const fields = parseYup(schema as any)
+const fields = parseYup(schema)
 const submitted = ref<Record<string, unknown> | null>(null)
 
 const { values, errors, touched, isSubmitting, submit, reset, setField } = useForm({

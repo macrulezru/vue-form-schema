@@ -14,7 +14,6 @@ import type { z } from 'zod'
 // Minimal Zod type surface we need (avoid importing zod types at build time).
 // All optional message fields use `string | undefined` so the type is
 // compatible with exactOptionalPropertyTypes and Zod's own generated types.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ZodTypeAny = any
 
 // ─── Mapping helpers ──────────────────────────────────────────────────────────

@@ -80,7 +80,7 @@ const schema: FieldDefinition[] = [
 
 const submitted = ref<Record<string, unknown> | null>(null)
 
-const { fields, values, errors, touched, isDirty, submit, reset, setField } = useForm({
+const { fields, values, errors, touched, submit, reset, setField } = useForm({
   schema,
   validateOn: 'blur',
   clearOnHide: true,
@@ -101,10 +101,6 @@ const visibleFields = computed(() => fields.value.filter((f) => f.visible !== fa
 function isVisible(name: string) {
   return visibleFields.value.some((f) => f.name === name)
 }
-function isDisabled(name: string) {
-  return fields.value.find((f) => f.name === name)?.disabled === true
-}
-
 const accountOptions = [
   { label: 'Personal', value: 'personal' },
   { label: 'Business', value: 'business' },

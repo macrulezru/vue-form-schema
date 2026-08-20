@@ -2,7 +2,7 @@
 import { ref, defineComponent, h } from 'vue'
 import { useForm, provideRegistry } from 'vue-form-schema'
 import { FormRenderer } from 'vue-form-schema/ui'
-import type { FieldDefinition, FormFieldProps } from 'vue-form-schema'
+import type { FieldDefinition } from 'vue-form-schema'
 
 // ── Custom "pill toggle" component for boolean fields ─────────────────────────
 const PillToggle = defineComponent({

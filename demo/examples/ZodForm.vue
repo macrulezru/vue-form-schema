@@ -27,7 +27,7 @@ const submitted = ref<FormData | null>(null)
 
 // No `useForm<FormData>(...)` needed — `fields` carries the inferred type
 // from `schema` (via parseZod), so `data` in onSubmit is already `FormData`.
-const { values, errors, touched, isValid, isSubmitting, submit, reset, setField } = useForm({
+const { values, errors, touched, isSubmitting, submit, reset, setField } = useForm({
   schema: fields,
   validateOn: 'blur',
   onSubmit: async (data) => {
