@@ -10,7 +10,6 @@ import type { FieldDefinition, TypedFieldDefinitions, ValidatorFn } from '../cor
 // carry the schema's inferred value type through to `useForm`.
 import type { AnySchema, InferType } from 'yup'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type YupSchema = any
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useForm, required, minLength } from 'vue-form-schema'
+import { useForm, minLength } from 'vue-form-schema'
 import { FormRenderer } from 'vue-form-schema/ui'
 import type { FieldDefinition } from 'vue-form-schema'
 
