@@ -71,16 +71,17 @@ const views: Record<string, ReturnType<typeof defineAsyncComponent>> = {
 
       <template v-for="group in groups" :key="group">
         <div class="nav-group-title">{{ group }}</div>
-        <div
+        <button
           v-for="page in pages.filter((p) => p.group === group)"
           :key="page.id"
+          type="button"
           class="nav-item"
           :class="{ active: active === page.id }"
           @click="active = page.id"
         >
           <span class="nav-icon">{{ page.icon }}</span>
           {{ page.label }}
-        </div>
+        </button>
       </template>
     </aside>
 

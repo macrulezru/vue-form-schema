@@ -1090,7 +1090,7 @@ const schema = z.discriminatedUnion('paymentMethod', [
 const fields = parseZod(schema)
 ```
 
-This only applies when the discriminated union/variant is the *root* schema passed to `parseZod`/`parseValibot` — a discriminated union nested as a property inside a larger `z.object({...})` is not expanded automatically; use `discriminatedFields` directly for that case.
+This only applies when the discriminated union/variant is the _root_ schema passed to `parseZod`/`parseValibot` — a discriminated union nested as a property inside a larger `z.object({...})` is not expanded automatically; use `discriminatedFields` directly for that case.
 
 ---
 

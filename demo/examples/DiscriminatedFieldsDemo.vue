@@ -69,10 +69,10 @@ const addressForm = useForm({
     <div class="page-header">
       <h2>Discriminated schemas</h2>
       <p>
-        <code>discriminatedFields(discriminatorName, variants)</code> switches a whole set of
-        fields based on one selector field's value, instead of hand-wiring <code>visible</code>
-        on every field. Combine with <code>clearOnHide: true</code> so switching variants resets
-        the hidden variant's values.
+        <code>discriminatedFields(discriminatorName, variants)</code> switches a whole set of fields
+        based on one selector field's value, instead of hand-wiring <code>visible</code> on every
+        field. Combine with <code>clearOnHide: true</code> so switching variants resets the hidden
+        variant's values.
       </p>
     </div>
 
@@ -80,8 +80,8 @@ const addressForm = useForm({
     <div class="card">
       <div class="card-title">discriminatedFields() — payment method</div>
       <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 16px">
-        Switch "Payment method" — the card fields and the PayPal field never share the form at
-        the same time, and switching clears the other variant's values.
+        Switch "Payment method" — the card fields and the PayPal field never share the form at the
+        same time, and switching clears the other variant's values.
       </p>
       <FormRenderer :form="paymentForm" submit-label="Pay" />
       <div class="card-title" style="margin-top: 16px">Values</div>
