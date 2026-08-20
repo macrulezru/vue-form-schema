@@ -11,6 +11,10 @@ coverage/
 .vite/
 demo/.vite/
 
+# Nuxt
+.nuxt/
+.output/
+
 # TypeScript incremental build info
 *.tsbuildinfo
 
@@ -26,6 +30,7 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+todo.md
 
 # Claude Code
 .claude/

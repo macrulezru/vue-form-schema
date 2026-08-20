@@ -58,9 +58,7 @@ export function useMultiStepForm(
     // submit() on a step form validates all its fields and marks them touched.
     // Step forms have no onSubmit, so it is a pure validation run.
     await steps[currentStep.value].submit()
-    const hasErrors = Object.values(steps[currentStep.value].errors.value).some(
-      (e) => e.length > 0,
-    )
+    const hasErrors = Object.values(steps[currentStep.value].errors.value).some((e) => e.length > 0)
     if (hasErrors) return false
     if (!isLastStep.value) currentStep.value++
     return true

@@ -5,10 +5,10 @@ import { parseZod } from 'vue-form-schema/zod'
 import { useForm } from 'vue-form-schema'
 
 const schema = z.object({
-  username:   z.string().min(3, 'At least 3 characters').max(20).describe('Username'),
-  email:      z.string().email('Invalid email address').describe('Email'),
-  website:    z.string().url('Must be a valid URL').optional().describe('Website'),
-  role:       z.enum(['admin', 'editor', 'viewer']).describe('Role'),
+  username: z.string().min(3, 'At least 3 characters').max(20).describe('Username'),
+  email: z.string().email('Invalid email address').describe('Email'),
+  website: z.string().url('Must be a valid URL').optional().describe('Website'),
+  role: z.enum(['admin', 'editor', 'viewer']).describe('Role'),
   newsletter: z.boolean().optional().describe('Subscribe to newsletter'),
 })
 
@@ -25,7 +25,9 @@ const schemaCode = `const schema = z.object({
 const fields = parseZod(schema)
 const submitted = ref<FormData | null>(null)
 
-const { values, errors, touched, isValid, isSubmitting, submit, reset, setField } = useForm<FormData>({
+// No `useForm<FormData>(...)` needed — `fields` carries the inferred type
+// from `schema` (via parseZod), so `data` in onSubmit is already `FormData`.
+const { values, errors, touched, isValid, isSubmitting, submit, reset, setField } = useForm({
   schema: fields,
   validateOn: 'blur',
   onSubmit: async (data) => {
@@ -34,11 +36,15 @@ const { values, errors, touched, isValid, isSubmitting, submit, reset, setField 
   },
 })
 
-function touch(name: string) { touched.value[name] = true }
-function hasError(name: string) { return touched.value[name] && errors.value[name]?.length }
+function touch(name: string) {
+  touched.value[name] = true
+}
+function hasError(name: string) {
+  return touched.value[name] && errors.value[name]?.length
+}
 
 const roleOptions = [
-  { label: 'Admin',  value: 'admin'  },
+  { label: 'Admin', value: 'admin' },
   { label: 'Editor', value: 'editor' },
   { label: 'Viewer', value: 'viewer' },
 ]
@@ -49,8 +55,8 @@ const roleOptions = [
     <div class="page-header">
       <h2>Zod schema <span class="badge badge-zod">Zod</span></h2>
       <p>
-        Define your schema with Zod and pass it through <code>parseZod()</code>.
-        All Zod constraints are converted to validator functions; <code>.describe()</code>
+        Define your schema with Zod and pass it through <code>parseZod()</code>. All Zod constraints
+        are converted to validator functions; <code>.describe()</code>
         sets the field label.
       </p>
     </div>
@@ -88,7 +94,7 @@ const roleOptions = [
         </div>
 
         <div class="field">
-          <label>Website <span style="color:var(--muted)">(optional)</span></label>
+          <label>Website <span style="color: var(--muted)">(optional)</span></label>
           <input
             :value="values.website ?? ''"
             :class="{ 'has-error': hasError('website') }"
@@ -107,8 +113,12 @@ const roleOptions = [
             @blur="touch('role')"
           >
             <option value="" disabled :selected="!values.role">Select a role</option>
-            <option v-for="opt in roleOptions" :key="opt.value"
-              :value="opt.value" :selected="values.role === opt.value">
+            <option
+              v-for="opt in roleOptions"
+              :key="opt.value"
+              :value="opt.value"
+              :selected="values.role === opt.value"
+            >
               {{ opt.label }}
             </option>
           </select>
@@ -136,13 +146,21 @@ const roleOptions = [
     </div>
 
     <div v-if="submitted" class="card">
-      <div class="card-title">✅ Submitted values (typed as <code>z.infer&lt;typeof schema&gt;</code>)</div>
+      <div class="card-title">
+        ✅ Submitted values (typed as <code>z.infer&lt;typeof schema&gt;</code>)
+      </div>
       <pre class="values-preview">{{ JSON.stringify(submitted, null, 2) }}</pre>
     </div>
 
     <div class="card">
       <div class="card-title">Parsed fields from Zod</div>
-      <pre class="values-preview">{{ JSON.stringify(fields.map(f => ({ name: f.name, type: f.type, label: f.label, required: f.required })), null, 2) }}</pre>
+      <pre class="values-preview">{{
+        JSON.stringify(
+          fields.map((f) => ({ name: f.name, type: f.type, label: f.label, required: f.required })),
+          null,
+          2,
+        )
+      }}</pre>
     </div>
   </div>
 </template>

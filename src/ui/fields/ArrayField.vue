@@ -79,14 +79,10 @@ function isTouched(f: FieldDefinition): boolean {
             @blur="touchField(subField)"
           />
         </template>
-        <button type="button" class="vfs-array__remove" @click="remove(row.index)">
-          Remove
-        </button>
+        <button type="button" class="vfs-array__remove" @click="remove(row.index)">Remove</button>
       </div>
 
-      <button type="button" class="vfs-array__add" @click="append()">
-        + Add row
-      </button>
+      <button type="button" class="vfs-array__add" @click="append()">+ Add row</button>
     </BaseField>
   </div>
 </template>

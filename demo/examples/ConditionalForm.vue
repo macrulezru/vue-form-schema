@@ -48,10 +48,10 @@ const schema: FieldDefinition[] = [
     // string expression — evaluated against `values`
     visible: 'values.age >= 18',
     options: [
-      { label: 'Beer',    value: 'beer'   },
-      { label: 'Wine',    value: 'wine'   },
+      { label: 'Beer', value: 'beer' },
+      { label: 'Wine', value: 'wine' },
       { label: 'Cocktail', value: 'cocktail' },
-      { label: 'Water',   value: 'water'  },
+      { label: 'Water', value: 'water' },
     ],
   },
   {
@@ -90,15 +90,26 @@ const { fields, values, errors, touched, isDirty, submit, reset, setField } = us
   },
 })
 
-function touch(name: string) { touched.value[name] = true }
-function hasError(name: string) { return touched.value[name] && errors.value[name]?.length }
+function touch(name: string) {
+  touched.value[name] = true
+}
+function hasError(name: string) {
+  return touched.value[name] && errors.value[name]?.length
+}
 
 const visibleFields = computed(() => fields.value.filter((f) => f.visible !== false))
-function isVisible(name: string) { return visibleFields.value.some((f) => f.name === name) }
-function isDisabled(name: string) { return fields.value.find((f) => f.name === name)?.disabled === true }
+function isVisible(name: string) {
+  return visibleFields.value.some((f) => f.name === name)
+}
+function isDisabled(name: string) {
+  return fields.value.find((f) => f.name === name)?.disabled === true
+}
 
-const accountOptions = [{ label: 'Personal', value: 'personal' }, { label: 'Business', value: 'business' }]
-const drinkOptions   = schema.find((f) => f.name === 'drinkChoice')!.options!
+const accountOptions = [
+  { label: 'Personal', value: 'personal' },
+  { label: 'Business', value: 'business' },
+]
+const drinkOptions = schema.find((f) => f.name === 'drinkChoice')!.options!
 </script>
 
 <template>
@@ -106,15 +117,16 @@ const drinkOptions   = schema.find((f) => f.name === 'drinkChoice')!.options!
     <div class="page-header">
       <h2>Conditional fields</h2>
       <p>
-        Fields can show / hide / disable based on current values using a <strong>function</strong>
-        or a <strong>string expression</strong>. When <code>clearOnHide: true</code> is set, hiding
-        a field resets its value automatically.
+        Fields can show / hide / disable based on current values using a
+        <strong>function</strong> or a <strong>string expression</strong>. When
+        <code>clearOnHide: true</code> is set, hiding a field resets its value automatically.
       </p>
     </div>
 
     <div class="card">
       <div class="card-title">How it works</div>
-      <pre class="code-block">// function condition
+      <pre class="code-block">
+// function condition
 visible: (values) => values.accountType === 'business'
 
 // string expression (safe subset of JS)
@@ -126,7 +138,6 @@ useForm({ schema, clearOnHide: true })</pre>
 
     <div class="card">
       <form novalidate @submit.prevent="submit">
-
         <!-- Account type -->
         <div class="field">
           <label>Account type</label>
@@ -156,10 +167,12 @@ useForm({ schema, clearOnHide: true })</pre>
                 @input="setField('companyName', ($event.target as HTMLInputElement).value)"
                 @blur="touch('companyName')"
               />
-              <div v-if="hasError('companyName')" class="field-error">{{ errors['companyName'][0] }}</div>
+              <div v-if="hasError('companyName')" class="field-error">
+                {{ errors['companyName'][0] }}
+              </div>
             </div>
             <div class="field">
-              <label>VAT number <span style="color:var(--muted)">(optional)</span></label>
+              <label>VAT number <span style="color: var(--muted)">(optional)</span></label>
               <input
                 :value="values.vatNumber ?? ''"
                 placeholder="DE123456789"
@@ -187,11 +200,20 @@ useForm({ schema, clearOnHide: true })</pre>
 
         <Transition name="slide">
           <div v-if="isVisible('drinkChoice')" class="field">
-            <label>Drink preference <span style="color:var(--muted);font-size:0.72rem">(visible: "values.age >= 18")</span></label>
+            <label
+              >Drink preference
+              <span style="color: var(--muted); font-size: 0.72rem"
+                >(visible: "values.age >= 18")</span
+              ></label
+            >
             <select @change="setField('drinkChoice', ($event.target as HTMLSelectElement).value)">
               <option value="" disabled :selected="!values.drinkChoice">Pick a drink</option>
-              <option v-for="opt in drinkOptions" :key="String(opt.value)"
-                :value="opt.value" :selected="values.drinkChoice === opt.value">
+              <option
+                v-for="opt in drinkOptions"
+                :key="String(opt.value)"
+                :value="opt.value"
+                :selected="values.drinkChoice === opt.value"
+              >
                 {{ opt.label }}
               </option>
             </select>
@@ -201,7 +223,7 @@ useForm({ schema, clearOnHide: true })</pre>
         <Transition name="slide">
           <div v-if="isVisible('minorNote')" class="field">
             <label>Note</label>
-            <input :value="values.minorNote" disabled style="opacity:0.5" />
+            <input :value="values.minorNote" disabled style="opacity: 0.5" />
           </div>
         </Transition>
 
@@ -221,12 +243,17 @@ useForm({ schema, clearOnHide: true })</pre>
 
         <Transition name="slide">
           <div v-if="isVisible('promoCode')" class="field">
-            <label>Promo code <span style="color:var(--muted);font-size:0.72rem">(cleared on hide)</span></label>
+            <label
+              >Promo code
+              <span style="color: var(--muted); font-size: 0.72rem">(cleared on hide)</span></label
+            >
             <input
               :value="values.promoCode ?? ''"
               placeholder="SAVE20"
               style="text-transform: uppercase"
-              @input="setField('promoCode', ($event.target as HTMLInputElement).value.toUpperCase())"
+              @input="
+                setField('promoCode', ($event.target as HTMLInputElement).value.toUpperCase())
+              "
             />
           </div>
         </Transition>
@@ -239,7 +266,9 @@ useForm({ schema, clearOnHide: true })</pre>
     </div>
 
     <div v-if="submitted" class="card">
-      <div class="card-title">✅ Submitted (hidden fields are not included when clearOnHide=true)</div>
+      <div class="card-title">
+        ✅ Submitted (hidden fields are not included when clearOnHide=true)
+      </div>
       <pre class="values-preview">{{ JSON.stringify(submitted, null, 2) }}</pre>
     </div>
 
@@ -252,7 +281,12 @@ useForm({ schema, clearOnHide: true })</pre>
 
 <style scoped>
 .slide-enter-active,
-.slide-leave-active { transition: all 0.2s ease; }
+.slide-leave-active {
+  transition: all 0.2s ease;
+}
 .slide-enter-from,
-.slide-leave-to { opacity: 0; transform: translateY(-6px); }
+.slide-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
 </style>

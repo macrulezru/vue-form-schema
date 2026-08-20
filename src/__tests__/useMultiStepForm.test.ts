@@ -113,10 +113,12 @@ describe('useMultiStepForm — values & submit', () => {
     w.vm.steps[1].setField('email', 'alice@test.com')
     await nextTick()
     await w.vm.submit()
-    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({
-      firstName: 'Alice',
-      email: 'alice@test.com',
-    }))
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        firstName: 'Alice',
+        email: 'alice@test.com',
+      }),
+    )
   })
 
   it('submit() does not call onSubmit when a step is invalid', async () => {

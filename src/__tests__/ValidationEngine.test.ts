@@ -73,7 +73,9 @@ describe('url', () => {
 describe('ValidationEngine', () => {
   let engine: ValidationEngine
 
-  beforeEach(() => { engine = new ValidationEngine(0) })
+  beforeEach(() => {
+    engine = new ValidationEngine(0)
+  })
   afterEach(() => engine.destroy())
 
   describe('validateField', () => {
@@ -117,11 +119,13 @@ describe('ValidationEngine', () => {
     })
 
     it('handles nested group fields', () => {
-      const fields: FieldDefinition[] = [{
-        type: 'group',
-        name: 'address',
-        fields: [{ type: 'text', name: 'address.city', required: true }],
-      }]
+      const fields: FieldDefinition[] = [
+        {
+          type: 'group',
+          name: 'address',
+          fields: [{ type: 'text', name: 'address.city', required: true }],
+        },
+      ]
       const errors = engine.validateAll(fields, { 'address.city': '' })
       expect(errors['address.city']).toBeTruthy()
     })
@@ -132,7 +136,7 @@ describe('ValidationEngine', () => {
       const field: FieldDefinition = {
         type: 'text',
         name: 'username',
-        asyncValidators: [async (v) => v === 'taken' ? 'Username taken' : null],
+        asyncValidators: [async (v) => (v === 'taken' ? 'Username taken' : null)],
       }
       const onResult = vi.fn()
       engine.validateAsync(field, 'taken', {}, onResult)

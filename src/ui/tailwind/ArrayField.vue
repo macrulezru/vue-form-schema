@@ -21,9 +21,14 @@ const props = defineProps<{
 const registry = useRegistry()
 
 const defaultComponents: Partial<Record<FieldDefinition['type'], Component>> = {
-  text: TextField, email: TextField, number: NumberField,
-  textarea: TextareaField, select: SelectField,
-  checkbox: CheckboxField, radio: RadioField, date: DateField,
+  text: TextField,
+  email: TextField,
+  number: NumberField,
+  textarea: TextareaField,
+  select: SelectField,
+  checkbox: CheckboxField,
+  radio: RadioField,
+  date: DateField,
 }
 
 function resolveComponent(f: FieldDefinition): Component | string | null {
@@ -36,13 +41,19 @@ const { rows, append, remove } = useFieldArray(props.form, props.field.name)
 function getValue(f: FieldDefinition) {
   return getByPath(props.form.values.value as Record<string, unknown>, f.name)
 }
-function setValue(f: FieldDefinition, value: unknown) { props.form.setField(f.name, value) }
+function setValue(f: FieldDefinition, value: unknown) {
+  props.form.setField(f.name, value)
+}
 function touchField(f: FieldDefinition) {
   const form = props.form as UseFormReturn & { touchField?: (p: string) => void }
   form.touchField?.(f.name)
 }
-function getErrors(f: FieldDefinition): string[] { return props.form.errors.value[f.name] ?? [] }
-function isTouched(f: FieldDefinition): boolean { return props.form.touched.value[f.name] ?? false }
+function getErrors(f: FieldDefinition): string[] {
+  return props.form.errors.value[f.name] ?? []
+}
+function isTouched(f: FieldDefinition): boolean {
+  return props.form.touched.value[f.name] ?? false
+}
 </script>
 
 <template>

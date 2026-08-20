@@ -67,20 +67,20 @@ const rawInput = ref('9161234567')
 const selectedPreset = ref<'phone-ru' | 'phone-eu' | 'date' | 'inn'>('phone-ru')
 
 const presets: { label: string; value: 'phone-ru' | 'phone-eu' | 'date' | 'inn'; raw: string }[] = [
-  { label: 'Phone RU',  value: 'phone-ru',  raw: '9161234567'   },
-  { label: 'Phone EU',  value: 'phone-eu',  raw: '493012345678' },
-  { label: 'Date',      value: 'date',       raw: '01012024'     },
-  { label: 'INN',       value: 'inn',        raw: '123456789012' },
+  { label: 'Phone RU', value: 'phone-ru', raw: '9161234567' },
+  { label: 'Phone EU', value: 'phone-eu', raw: '493012345678' },
+  { label: 'Date', value: 'date', raw: '01012024' },
+  { label: 'INN', value: 'inn', raw: '123456789012' },
 ]
 
-function selectPreset(p: typeof presets[0]) {
+function selectPreset(p: (typeof presets)[0]) {
   selectedPreset.value = p.value
   rawInput.value = p.raw
 }
 
 const maskConfig = (): MaskConfig => ({ preset: selectedPreset.value })
 const maskedOutput = () => applyMask(rawInput.value, maskConfig())
-const rawOutput    = () => removeMask(maskedOutput(), maskConfig())
+const rawOutput = () => removeMask(maskedOutput(), maskConfig())
 
 // Per-field mask handlers using setField
 const fieldInputRefs: Record<string, HTMLInputElement | null> = {}
@@ -110,25 +110,30 @@ onUnmounted(() => fieldCleanups.forEach((fn) => fn()))
     <!-- Preset table -->
     <div class="card">
       <div class="card-title">Built-in presets</div>
-      <table style="width:100%;font-size:0.82rem;border-collapse:collapse">
+      <table style="width: 100%; font-size: 0.82rem; border-collapse: collapse">
         <thead>
-          <tr style="color:var(--muted);text-align:left">
-            <th style="padding:6px 10px">Preset</th>
-            <th style="padding:6px 10px">Pattern</th>
-            <th style="padding:6px 10px">Example</th>
+          <tr style="color: var(--muted); text-align: left">
+            <th style="padding: 6px 10px">Preset</th>
+            <th style="padding: 6px 10px">Pattern</th>
+            <th style="padding: 6px 10px">Example</th>
           </tr>
         </thead>
-        <tbody style="color:var(--text)">
-          <tr v-for="row in [
-            ['phone-ru', '+7 (###) ###-##-##', '+7 (916) 123-45-67'],
-            ['phone-eu', '+## (##) ###-##-##', '+49 (30) 123-45-67'],
-            ['date',     '##.##.####',          '01.01.2024'],
-            ['inn',      '############',         '123456789012'],
-            ['iban',     'AA## #### ####…',      'GB29 NWBK 6016…'],
-          ]" :key="row[0]">
-            <td style="padding:6px 10px;font-family:var(--mono);color:var(--accent)">{{ row[0] }}</td>
-            <td style="padding:6px 10px;font-family:var(--mono)">{{ row[1] }}</td>
-            <td style="padding:6px 10px;color:var(--muted)">{{ row[2] }}</td>
+        <tbody style="color: var(--text)">
+          <tr
+            v-for="row in [
+              ['phone-ru', '+7 (###) ###-##-##', '+7 (916) 123-45-67'],
+              ['phone-eu', '+## (##) ###-##-##', '+49 (30) 123-45-67'],
+              ['date', '##.##.####', '01.01.2024'],
+              ['inn', '############', '123456789012'],
+              ['iban', 'AA## #### ####…', 'GB29 NWBK 6016…'],
+            ]"
+            :key="row[0]"
+          >
+            <td style="padding: 6px 10px; font-family: var(--mono); color: var(--accent)">
+              {{ row[0] }}
+            </td>
+            <td style="padding: 6px 10px; font-family: var(--mono)">{{ row[1] }}</td>
+            <td style="padding: 6px 10px; color: var(--muted)">{{ row[2] }}</td>
           </tr>
         </tbody>
       </table>
@@ -137,11 +142,14 @@ onUnmounted(() => fieldCleanups.forEach((fn) => fn()))
     <!-- Standalone API playground -->
     <div class="card">
       <div class="card-title">Standalone API playground</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px">
         <button
-          v-for="p in presets" :key="p.value"
+          v-for="p in presets"
+          :key="p.value"
           class="btn btn-ghost"
-          :style="selectedPreset === p.value ? 'border-color:var(--accent);color:var(--accent)' : ''"
+          :style="
+            selectedPreset === p.value ? 'border-color:var(--accent);color:var(--accent)' : ''
+          "
           @click="selectPreset(p)"
         >
           {{ p.label }}
@@ -151,11 +159,12 @@ onUnmounted(() => fieldCleanups.forEach((fn) => fn()))
         <label>Raw input</label>
         <input
           :value="rawInput"
-          style="font-family:var(--mono)"
+          style="font-family: var(--mono)"
           @input="rawInput = ($event.target as HTMLInputElement).value"
         />
       </div>
-      <pre class="code-block">applyMask('{{ rawInput }}', { preset: '{{ selectedPreset }}' })
+      <pre class="code-block">
+applyMask('{{ rawInput }}', { preset: '{{ selectedPreset }}' })
 → '{{ maskedOutput() }}'
 
 removeMask('{{ maskedOutput() }}', { preset: '{{ selectedPreset }}' })
@@ -187,9 +196,14 @@ removeMask('{{ maskedOutput() }}', { preset: '{{ selectedPreset }}' })
         <div class="field">
           <label>Card number</label>
           <input
-            :ref="(el) => mountFieldMask(el as HTMLInputElement, 'cardNumber', { pattern: '#### #### #### ####' })"
+            :ref="
+              (el) =>
+                mountFieldMask(el as HTMLInputElement, 'cardNumber', {
+                  pattern: '#### #### #### ####',
+                })
+            "
             placeholder="#### #### #### ####"
-            style="font-family:var(--mono);letter-spacing:0.05em"
+            style="font-family: var(--mono); letter-spacing: 0.05em"
           />
           <div class="hint">Raw value: {{ values.cardNumber ?? '—' }}</div>
         </div>
@@ -199,7 +213,7 @@ removeMask('{{ maskedOutput() }}', { preset: '{{ selectedPreset }}' })
           <input
             ref="ibanInputRef"
             placeholder="GB__ ____ ____ ____ ____ ____ ____"
-            style="font-family:var(--mono);letter-spacing:0.04em"
+            style="font-family: var(--mono); letter-spacing: 0.04em"
           />
           <div class="hint">Masked: {{ ibanValue || '—' }}</div>
         </div>
@@ -209,7 +223,7 @@ removeMask('{{ maskedOutput() }}', { preset: '{{ selectedPreset }}' })
           <input
             :ref="(el) => mountFieldMask(el as HTMLInputElement, 'postcode', { pattern: 'AA####' })"
             placeholder="AB1234"
-            style="text-transform:uppercase"
+            style="text-transform: uppercase"
           />
           <div class="hint">Raw value: {{ values.postcode ?? '—' }}</div>
         </div>

@@ -2,7 +2,7 @@
 import BaseField from './BaseField.vue'
 import type { FieldDefinition } from '../../core/types'
 
-const props = defineProps<{
+defineProps<{
   field: FieldDefinition
   modelValue: string | null
   error?: string[]

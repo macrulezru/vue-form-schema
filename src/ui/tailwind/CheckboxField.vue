@@ -2,7 +2,7 @@
 import BaseField from './BaseField.vue'
 import type { FieldDefinition } from '../../core/types'
 
-const props = defineProps<{
+defineProps<{
   field: FieldDefinition
   modelValue: boolean | null
   error?: string[]
@@ -16,7 +16,12 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <BaseField v-slot="aria" :field="{ ...field, label: undefined }" :error="error" :touched="touched">
+  <BaseField
+    v-slot="aria"
+    :field="{ ...field, label: undefined }"
+    :error="error"
+    :touched="touched"
+  >
     <label class="flex cursor-pointer items-center gap-2.5">
       <input
         :id="field.name"

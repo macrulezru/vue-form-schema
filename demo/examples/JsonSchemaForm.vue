@@ -23,9 +23,9 @@ const rawSchema: JSONSchema = [
     required: true,
     options: [
       { label: 'Electronics', value: 'electronics' },
-      { label: 'Clothing',    value: 'clothing' },
-      { label: 'Books',       value: 'books' },
-      { label: 'Home',        value: 'home' },
+      { label: 'Clothing', value: 'clothing' },
+      { label: 'Books', value: 'books' },
+      { label: 'Home', value: 'home' },
     ],
   },
   {
@@ -52,7 +52,11 @@ const rawSchema: JSONSchema = [
     label: 'SKU',
     placeholder: 'WIDGET-001',
     validators: [
-      { rule: 'pattern', value: '^[A-Z0-9\\-]+$', message: 'Only uppercase letters, digits and hyphens' },
+      {
+        rule: 'pattern',
+        value: '^[A-Z0-9\\-]+$',
+        message: 'Only uppercase letters, digits and hyphens',
+      },
     ],
   },
   {
@@ -84,8 +88,12 @@ const { values, errors, touched, isValid, isSubmitting, submit, reset, setField 
   },
 })
 
-function touch(name: string) { touched.value[name] = true }
-function hasError(name: string) { return touched.value[name] && errors.value[name]?.length }
+function touch(name: string) {
+  touched.value[name] = true
+}
+function hasError(name: string) {
+  return touched.value[name] && errors.value[name]?.length
+}
 function getOption(fieldName: string) {
   return fields.find((f) => f.name === fieldName)?.options ?? []
 }
@@ -96,9 +104,9 @@ function getOption(fieldName: string) {
     <div class="page-header">
       <h2>JSON schema <span class="badge badge-json">JSON</span></h2>
       <p>
-        Schema defined as a plain serialisable array — suitable for server-driven forms.
-        Validators are expressed as named rules (<code>minLength</code>, <code>pattern</code>, …)
-        and converted to functions by <code>parseJSON()</code>.
+        Schema defined as a plain serialisable array — suitable for server-driven forms. Validators
+        are expressed as named rules (<code>minLength</code>, <code>pattern</code>, …) and converted
+        to functions by <code>parseJSON()</code>.
       </p>
     </div>
 
@@ -118,7 +126,9 @@ function getOption(fieldName: string) {
             @input="setField('productName', ($event.target as HTMLInputElement).value)"
             @blur="touch('productName')"
           />
-          <div v-if="hasError('productName')" class="field-error">{{ errors['productName'][0] }}</div>
+          <div v-if="hasError('productName')" class="field-error">
+            {{ errors['productName'][0] }}
+          </div>
         </div>
 
         <div class="field-row">
@@ -130,8 +140,12 @@ function getOption(fieldName: string) {
               @blur="touch('category')"
             >
               <option value="" disabled :selected="!values.category">Pick a category</option>
-              <option v-for="opt in getOption('category')" :key="String(opt.value)"
-                :value="opt.value" :selected="values.category === opt.value">
+              <option
+                v-for="opt in getOption('category')"
+                :key="String(opt.value)"
+                :value="opt.value"
+                :selected="values.category === opt.value"
+              >
                 {{ opt.label }}
               </option>
             </select>
@@ -161,7 +175,9 @@ function getOption(fieldName: string) {
               :class="{ 'has-error': hasError('price') }"
               placeholder="9.99"
               step="0.01"
-              @input="setField('price', parseFloat(($event.target as HTMLInputElement).value) || null)"
+              @input="
+                setField('price', parseFloat(($event.target as HTMLInputElement).value) || null)
+              "
               @blur="touch('price')"
             />
             <div v-if="hasError('price')" class="field-error">{{ errors['price'][0] }}</div>

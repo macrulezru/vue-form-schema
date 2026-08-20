@@ -12,16 +12,10 @@ import {
 
 // ─── Rule → ValidatorFn ───────────────────────────────────────────────────────
 
-function ruleToValidator(
-  rule: string,
-  value: unknown,
-  message?: string,
-): ValidatorFn | null {
+function ruleToValidator(rule: string, value: unknown, message?: string): ValidatorFn | null {
   switch (rule) {
     case 'required':
-      return message
-        ? (v, vals) => (required(v, vals) ? message : null)
-        : required
+      return message ? (v, vals) => (required(v, vals) ? message : null) : required
     case 'minLength':
       return minLength(Number(value), message)
     case 'maxLength':
@@ -33,13 +27,9 @@ function ruleToValidator(
     case 'pattern':
       return pattern(new RegExp(String(value)), message)
     case 'email':
-      return message
-        ? (v, vals) => (email(v, vals) ? message : null)
-        : email
+      return message ? (v, vals) => (email(v, vals) ? message : null) : email
     case 'url':
-      return message
-        ? (v, vals) => (url(v, vals) ? message : null)
-        : url
+      return message ? (v, vals) => (url(v, vals) ? message : null) : url
     default:
       console.warn(`[vue-form-schema] Unknown validator rule: "${rule}"`)
       return null

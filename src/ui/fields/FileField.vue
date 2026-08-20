@@ -108,11 +108,7 @@ function formatSize(bytes: number): string {
     </div>
 
     <ul v-if="files.length" class="vfs-file-list">
-      <li
-        v-for="(file, i) in files"
-        :key="`${file.name}-${i}`"
-        class="vfs-file-item"
-      >
+      <li v-for="(file, i) in files" :key="`${file.name}-${i}`" class="vfs-file-item">
         <span class="vfs-file-name">{{ file.name }}</span>
         <span class="vfs-file-size">{{ formatSize(file.size) }}</span>
         <button

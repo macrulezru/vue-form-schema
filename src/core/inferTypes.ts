@@ -2,22 +2,30 @@ import type { FieldDefinition, FieldType } from './types'
 
 // ─── FieldType → value type mapping ──────────────────────────────────────────
 
-type FieldTypeValue<T extends FieldType> =
-  T extends 'checkbox' ? boolean :
-  T extends 'number' ? number :
-  T extends 'array' ? unknown[] :
-  T extends 'group' ? Record<string, unknown> :
-  string
+type FieldTypeValue<T extends FieldType> = T extends 'checkbox'
+  ? boolean
+  : T extends 'number'
+    ? number
+    : T extends 'array'
+      ? unknown[]
+      : T extends 'group'
+        ? Record<string, unknown>
+        : string
 
 // ─── Infer value type for a single field ─────────────────────────────────────
 
-type InferField<F> =
-  F extends { name: infer Name extends string; type: infer Type extends FieldType }
-    ? { [K in Name]: FieldTypeValue<Type> }
-    : never
+type InferField<F> = F extends {
+  name: infer Name extends string
+  type: infer Type extends FieldType
+}
+  ? { [K in Name]: FieldTypeValue<Type> }
+  : never
 
-type UnionToIntersection<U> =
-  (U extends unknown ? (x: U) => void : never) extends (x: infer I) => void ? I : never
+type UnionToIntersection<U> = (U extends unknown ? (x: U) => void : never) extends (
+  x: infer I,
+) => void
+  ? I
+  : never
 
 // ─── Public types ─────────────────────────────────────────────────────────────
 

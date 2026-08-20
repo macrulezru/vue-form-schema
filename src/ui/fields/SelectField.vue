@@ -15,9 +15,7 @@ const emit = defineEmits<{
   blur: []
 }>()
 
-const options = computed(() =>
-  Array.isArray(props.field.options) ? props.field.options : [],
-)
+const options = computed(() => (Array.isArray(props.field.options) ? props.field.options : []))
 
 function onChange(e: Event) {
   const target = e.target as HTMLSelectElement
@@ -40,7 +38,11 @@ function onChange(e: Event) {
       @change="onChange"
       @blur="emit('blur')"
     >
-      <option value="" disabled :selected="modelValue === null || modelValue === undefined || modelValue === ''">
+      <option
+        value=""
+        disabled
+        :selected="modelValue === null || modelValue === undefined || modelValue === ''"
+      >
         {{ field.placeholder ?? 'Select an option' }}
       </option>
       <option

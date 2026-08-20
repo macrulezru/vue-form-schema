@@ -31,10 +31,14 @@ describe('sameAs validator', () => {
       { type: 'text', name: 'password', required: true },
       { type: 'text', name: 'confirm', validators: [sameAs('password', 'Must match')] },
     ]
-    const w = mount(defineComponent({
-      setup() { return useForm({ schema, validateOn: 'input' }) },
-      template: '<div/>',
-    }))
+    const w = mount(
+      defineComponent({
+        setup() {
+          return useForm({ schema, validateOn: 'input' })
+        },
+        template: '<div/>',
+      }),
+    )
     w.vm.setField('password', 'abc')
     w.vm.setField('confirm', 'xyz')
     await nextTick()
@@ -50,30 +54,42 @@ describe('sameAs validator', () => {
 
 describe('field transform', () => {
   it('trims string on setField', async () => {
-    const schema: FieldDefinition[] = [{
-      type: 'text',
-      name: 'name',
-      transform: (v) => (typeof v === 'string' ? v.trim() : v),
-    }]
-    const w = mount(defineComponent({
-      setup() { return useForm({ schema }) },
-      template: '<div/>',
-    }))
+    const schema: FieldDefinition[] = [
+      {
+        type: 'text',
+        name: 'name',
+        transform: (v) => (typeof v === 'string' ? v.trim() : v),
+      },
+    ]
+    const w = mount(
+      defineComponent({
+        setup() {
+          return useForm({ schema })
+        },
+        template: '<div/>',
+      }),
+    )
     w.vm.setField('name', '  Alice  ')
     await nextTick()
     expect(w.vm.values.name).toBe('Alice')
   })
 
   it('coerces number string to number', async () => {
-    const schema: FieldDefinition[] = [{
-      type: 'number',
-      name: 'age',
-      transform: (v) => Number(v),
-    }]
-    const w = mount(defineComponent({
-      setup() { return useForm({ schema }) },
-      template: '<div/>',
-    }))
+    const schema: FieldDefinition[] = [
+      {
+        type: 'number',
+        name: 'age',
+        transform: (v) => Number(v),
+      },
+    ]
+    const w = mount(
+      defineComponent({
+        setup() {
+          return useForm({ schema })
+        },
+        template: '<div/>',
+      }),
+    )
     w.vm.setField('age', '25')
     await nextTick()
     expect(w.vm.values.age).toBe(25)
@@ -83,34 +99,47 @@ describe('field transform', () => {
 describe('field parse (submit time)', () => {
   it('applies parse before calling onSubmit', async () => {
     const onSubmit = vi.fn()
-    const schema: FieldDefinition[] = [{
-      type: 'text',
-      name: 'tags',
-      defaultValue: 'vue,react',
-      parse: (v) => String(v).split(',').map((s) => s.trim()),
-    }]
-    const w = mount(defineComponent({
-      setup() { return useForm({ schema, onSubmit }) },
-      template: '<div/>',
-    }))
-    await w.vm.submit()
-    expect(onSubmit).toHaveBeenCalledWith(
-      expect.objectContaining({ tags: ['vue', 'react'] }),
+    const schema: FieldDefinition[] = [
+      {
+        type: 'text',
+        name: 'tags',
+        defaultValue: 'vue,react',
+        parse: (v) =>
+          String(v)
+            .split(',')
+            .map((s) => s.trim()),
+      },
+    ]
+    const w = mount(
+      defineComponent({
+        setup() {
+          return useForm({ schema, onSubmit })
+        },
+        template: '<div/>',
+      }),
     )
+    await w.vm.submit()
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ tags: ['vue', 'react'] }))
   })
 
   it('raw values ref is not mutated by parse', async () => {
     const onSubmit = vi.fn()
-    const schema: FieldDefinition[] = [{
-      type: 'text',
-      name: 'code',
-      defaultValue: 'abc',
-      parse: (v) => String(v).toUpperCase(),
-    }]
-    const w = mount(defineComponent({
-      setup() { return useForm({ schema, onSubmit }) },
-      template: '<div/>',
-    }))
+    const schema: FieldDefinition[] = [
+      {
+        type: 'text',
+        name: 'code',
+        defaultValue: 'abc',
+        parse: (v) => String(v).toUpperCase(),
+      },
+    ]
+    const w = mount(
+      defineComponent({
+        setup() {
+          return useForm({ schema, onSubmit })
+        },
+        template: '<div/>',
+      }),
+    )
     await w.vm.submit()
     // values.code should still be the original 'abc', not 'ABC'
     expect(w.vm.values.code).toBe('abc')

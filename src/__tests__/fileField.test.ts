@@ -101,21 +101,29 @@ describe('fileCount validator', () => {
 // ─── #14 useForm with type: 'file' ───────────────────────────────────────────
 
 describe("useForm with type: 'file'", () => {
-  it("initialises file field value to null", () => {
+  it('initialises file field value to null', () => {
     const schema: FieldDefinition[] = [{ type: 'file', name: 'avatar' }]
-    const w = mount(defineComponent({
-      setup() { return useForm({ schema }) },
-      template: '<div/>',
-    }))
+    const w = mount(
+      defineComponent({
+        setup() {
+          return useForm({ schema })
+        },
+        template: '<div/>',
+      }),
+    )
     expect(w.vm.values.avatar).toBeNull()
   })
 
   it('sets File value via setField', async () => {
     const schema: FieldDefinition[] = [{ type: 'file', name: 'doc' }]
-    const w = mount(defineComponent({
-      setup() { return useForm({ schema }) },
-      template: '<div/>',
-    }))
+    const w = mount(
+      defineComponent({
+        setup() {
+          return useForm({ schema })
+        },
+        template: '<div/>',
+      }),
+    )
     const file = mockFile('doc.pdf', 500, 'application/pdf')
     w.vm.setField('doc', file)
     await nextTick()
@@ -125,15 +133,21 @@ describe("useForm with type: 'file'", () => {
   })
 
   it('validates file type on submit', async () => {
-    const schema: FieldDefinition[] = [{
-      type: 'file',
-      name: 'img',
-      validators: [fileType(['image/'], 'Images only')],
-    }]
-    const w = mount(defineComponent({
-      setup() { return useForm({ schema }) },
-      template: '<div/>',
-    }))
+    const schema: FieldDefinition[] = [
+      {
+        type: 'file',
+        name: 'img',
+        validators: [fileType(['image/'], 'Images only')],
+      },
+    ]
+    const w = mount(
+      defineComponent({
+        setup() {
+          return useForm({ schema })
+        },
+        template: '<div/>',
+      }),
+    )
     const badFile = mockFile('bad.exe', 100, 'application/octet-stream')
     w.vm.setField('img', badFile)
     await w.vm.submit()
@@ -141,15 +155,21 @@ describe("useForm with type: 'file'", () => {
   })
 
   it('validates file size on submit', async () => {
-    const schema: FieldDefinition[] = [{
-      type: 'file',
-      name: 'upload',
-      validators: [fileSize(100, 'Too large')],
-    }]
-    const w = mount(defineComponent({
-      setup() { return useForm({ schema }) },
-      template: '<div/>',
-    }))
+    const schema: FieldDefinition[] = [
+      {
+        type: 'file',
+        name: 'upload',
+        validators: [fileSize(100, 'Too large')],
+      },
+    ]
+    const w = mount(
+      defineComponent({
+        setup() {
+          return useForm({ schema })
+        },
+        template: '<div/>',
+      }),
+    )
     const bigFile = mockFile('big.jpg', 500, 'image/jpeg')
     w.vm.setField('upload', bigFile)
     await w.vm.submit()
@@ -158,15 +178,26 @@ describe("useForm with type: 'file'", () => {
 
   it('passes submit when file is valid', async () => {
     const submitted: unknown[] = []
-    const schema: FieldDefinition[] = [{
-      type: 'file',
-      name: 'pic',
-      validators: [fileSize(10_000)],
-    }]
-    const w = mount(defineComponent({
-      setup() { return useForm({ schema, onSubmit: (v) => { submitted.push(v) } }) },
-      template: '<div/>',
-    }))
+    const schema: FieldDefinition[] = [
+      {
+        type: 'file',
+        name: 'pic',
+        validators: [fileSize(10_000)],
+      },
+    ]
+    const w = mount(
+      defineComponent({
+        setup() {
+          return useForm({
+            schema,
+            onSubmit: (v) => {
+              submitted.push(v)
+            },
+          })
+        },
+        template: '<div/>',
+      }),
+    )
     const goodFile = mockFile('ok.jpg', 500, 'image/jpeg')
     w.vm.setField('pic', goodFile)
     await w.vm.submit()

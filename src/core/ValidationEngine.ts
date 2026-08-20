@@ -208,6 +208,46 @@ export class ValidationEngine {
     this.asyncTimers.set(field.name, timer)
   }
 
+  /**
+   * Run all async validators across all fields immediately (no debounce) and
+   * wait for the result. Used at submit time so a pending async validator
+   * (e.g. "username taken") can actually block submission.
+   */
+  async validateAllAsync(
+    fields: FieldDefinition[],
+    values: Record<string, unknown>,
+  ): Promise<Record<string, string[]>> {
+    const errors: Record<string, string[]> = {}
+    await this.collectAsyncErrors(fields, values, errors)
+    return errors
+  }
+
+  private async collectAsyncErrors(
+    fields: FieldDefinition[],
+    values: Record<string, unknown>,
+    errors: Record<string, string[]>,
+  ): Promise<void> {
+    const tasks: Promise<void>[] = []
+
+    for (const field of fields) {
+      if (field.asyncValidators?.length) {
+        const value = getByPath(values, field.name)
+        tasks.push(
+          Promise.all(field.asyncValidators.map((fn) => fn(value, values))).then((results) => {
+            const fieldErrors = results.filter((r): r is string => r !== null)
+            if (fieldErrors.length) errors[field.name] = fieldErrors
+          }),
+        )
+      }
+
+      if ((field.type === 'group' || field.type === 'array') && field.fields) {
+        tasks.push(this.collectAsyncErrors(field.fields, values, errors))
+      }
+    }
+
+    await Promise.all(tasks)
+  }
+
   destroy() {
     for (const timer of this.asyncTimers.values()) clearTimeout(timer)
     this.asyncTimers.clear()

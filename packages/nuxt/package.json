@@ -1,0 +1,62 @@
+{
+  "name": "@macrulez/nuxt-vue-form-schema",
+  "version": "0.1.0",
+  "description": "Nuxt module for @macrulez/vue-form-schema — auto-imports composables, schema adapters and (optionally) UI components.",
+  "author": "macrulez <macrulezru@gmail.com> (https://macrulez.ru/en)",
+  "license": "MIT",
+  "homepage": "https://github.com/macrulezru/vue-form-schema/tree/master/packages/nuxt#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/macrulezru/vue-form-schema.git",
+    "directory": "packages/nuxt"
+  },
+  "bugs": {
+    "url": "https://github.com/macrulezru/vue-form-schema/issues"
+  },
+  "type": "module",
+  "main": "./dist/module.mjs",
+  "exports": {
+    ".": {
+      "types": "./dist/types.d.mts",
+      "import": "./dist/module.mjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "prepack": "npm run typecheck && npm run build",
+    "build": "nuxt-module-build build",
+    "dev": "node scripts/nuxi.mjs dev playground",
+    "dev:build": "node scripts/nuxi.mjs build playground",
+    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && node scripts/nuxi.mjs prepare playground",
+    "typecheck": "npm run dev:prepare && tsc --noEmit"
+  },
+  "keywords": [
+    "nuxt",
+    "nuxt-module",
+    "vue",
+    "form",
+    "schema",
+    "validation"
+  ],
+  "dependencies": {
+    "@macrulez/vue-form-schema": "^0.1.9",
+    "@nuxt/kit": "^3.13.0"
+  },
+  "devDependencies": {
+    "@nuxt/module-builder": "^1.0.3",
+    "@nuxt/schema": "^3.21.0",
+    "nuxt": "^3.21.0",
+    "typescript": "^5.3.0"
+  },
+  "peerDependencies": {
+    "nuxt": "^3.13.0 || ^4.0.0"
+  }
+}

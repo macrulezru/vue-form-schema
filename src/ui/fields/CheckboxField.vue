@@ -2,7 +2,7 @@
 import BaseField from './BaseField.vue'
 import type { FieldDefinition } from '../../core/types'
 
-const props = defineProps<{
+defineProps<{
   field: FieldDefinition
   modelValue: boolean | null
   error?: string[]
@@ -18,7 +18,12 @@ const emit = defineEmits<{
 <template>
   <!-- Pass field without label so BaseField doesn't render a separate <label> above.
        The checkbox carries its own inline label text. -->
-  <BaseField v-slot="aria" :field="{ ...field, label: undefined }" :error="error" :touched="touched">
+  <BaseField
+    v-slot="aria"
+    :field="{ ...field, label: undefined }"
+    :error="error"
+    :touched="touched"
+  >
     <label class="vfs-checkbox-label">
       <input
         :id="field.name"
