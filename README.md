@@ -1108,7 +1108,7 @@ import { useForm } from '@macrulez/vue-form-schema'
 const schema = z.object({ username: z.string(), age: z.number() })
 const fields = parseZod(schema)
 
-const { values, onSubmit } = useForm({
+const { values } = useForm({
   schema: fields,
   onSubmit: (data) => {
     data.username // string ✓ — inferred from `schema`, not Record<string, unknown>
