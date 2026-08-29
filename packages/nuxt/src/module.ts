@@ -19,6 +19,15 @@ export interface ModuleOptions {
   components?: boolean
 }
 
+declare module '@nuxt/schema' {
+  interface NuxtConfig {
+    vueFormSchema?: ModuleOptions
+  }
+  interface NuxtOptions {
+    vueFormSchema: ModuleOptions
+  }
+}
+
 const CORE_MODULE = '@macrulez/vue-form-schema'
 
 // Composables, validators and schema-composition helpers re-exported for
@@ -76,7 +85,11 @@ export default defineNuxtModule<ModuleOptions>({
     autoImports: true,
     components: false,
   },
-  setup(options) {
+  setup(options, nuxt) {
+    nuxt.hook('prepare:types', ({ references }) => {
+      references.push({ types: '@macrulez/nuxt-vue-form-schema' })
+    })
+
     if (options.autoImports) {
       for (const name of AUTO_IMPORT_NAMES) {
         addImports({ name, from: CORE_MODULE })

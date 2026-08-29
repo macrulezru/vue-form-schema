@@ -1,6 +1,6 @@
 {
   "name": "@macrulez/nuxt-vue-form-schema",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Nuxt module for @macrulez/vue-form-schema — auto-imports composables, schema adapters and (optionally) UI components.",
   "author": "macrulez <macrulezru@gmail.com> (https://macrulez.ru/en)",
   "license": "MIT",
@@ -47,7 +47,7 @@
     "validation"
   ],
   "dependencies": {
-    "@macrulez/vue-form-schema": "^0.1.9",
+    "@macrulez/vue-form-schema": "^0.2.2",
     "@nuxt/kit": "^3.13.0"
   },
   "devDependencies": {

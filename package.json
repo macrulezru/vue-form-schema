@@ -1,6 +1,6 @@
 {
   "name": "@macrulez/vue-form-schema",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Reactive Vue 3 forms generated from JSON, Zod, Yup or Valibot schemas, with validation, input masking, conditional UI and SSR support.",
   "author": "macrulez <macrulezru@gmail.com> (https://macrulez.ru/en)",
   "license": "MIT",
@@ -74,7 +74,8 @@
       "types": "./dist/devtools.d.ts",
       "import": "./dist/devtools.js",
       "require": "./dist/devtools.cjs"
-    }
+    },
+    "./style.css": "./dist/style.css"
   },
   "files": [
     "dist",
