@@ -76,7 +76,8 @@ const attachmentsForm = useForm({
       <div class="card-title">Single file — image only, max 2 MB</div>
       <pre class="code-block" style="margin-bottom: 16px">
 { type: 'file', accept: 'image/*',
-  validators: [fileType(['image/']), fileSize(2 * 1024 * 1024)] }</pre>
+  validators: [fileType(['image/']), fileSize(2 * 1024 * 1024)] }</pre
+      >
       <FormRenderer :form="avatarForm" submit-label="Update profile" />
       <div v-if="avatarSubmitted" class="toast">
         ✅ Profile updated for {{ avatarSubmitted.name }}
@@ -88,7 +89,8 @@ const attachmentsForm = useForm({
       <div class="card-title">Multiple files — up to 5, max 10 MB each</div>
       <pre class="code-block" style="margin-bottom: 16px">
 { type: 'file', multiple: true, accept: '.pdf,.docx,.xlsx',
-  validators: [fileCount(5), fileSize(10 * 1024 * 1024)] }</pre>
+  validators: [fileCount(5), fileSize(10 * 1024 * 1024)] }</pre
+      >
       <FormRenderer :form="attachmentsForm" submit-label="Upload files" />
       <div v-if="attachmentsSubmitted" class="toast">
         ✅ "{{ attachmentsSubmitted.subject }}" — {{ attachmentsSubmitted.count }} file(s) uploaded
