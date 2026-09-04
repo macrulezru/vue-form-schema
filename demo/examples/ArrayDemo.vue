@@ -89,7 +89,8 @@ const memberArray = useFieldArray(form, 'members')
       </div>
       <pre class="values-preview">
 count: {{ memberArray.count.value }}
-members: {{ JSON.stringify(form.values.value.members, null, 2) }}</pre>
+members: {{ JSON.stringify(form.values.value.members, null, 2) }}</pre
+      >
     </div>
 
     <div class="card">

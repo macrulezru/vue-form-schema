@@ -39,15 +39,15 @@ Reactive forms from a declarative schema (JSON, Zod, Yup, or Valibot) for Vue 3.
 ## Installation
 
 | Environment         | Minimum version                                  |
-| ---------------------- | --------------------------------------------------- |
-| Node.js             | `20.12+`                                             |
-| Vue                 | `3.3.0+` (required)                                  |
-| `zod`               | `3.22.0+` (optional — only for `/zod`)               |
-| `yup`               | `1.3.0+` (optional — only for `/yup`)                |
-| `valibot`           | `1.0.0+` (optional — only for `/valibot`)            |
-| `primevue`          | `4.0.0+` (optional — only for `/ui/primevue`)        |
-| `naive-ui`          | `2.38.0+` (optional — only for `/ui/naive`)          |
-| `@vue/devtools-api` | `6+ / 7+ / 8+` (optional — only for `/devtools`)     |
+| ------------------- | ------------------------------------------------ |
+| Node.js             | `20.12+`                                         |
+| Vue                 | `3.3.0+` (required)                              |
+| `zod`               | `3.22.0+` (optional — only for `/zod`)           |
+| `yup`               | `1.3.0+` (optional — only for `/yup`)            |
+| `valibot`           | `1.0.0+` (optional — only for `/valibot`)        |
+| `primevue`          | `4.0.0+` (optional — only for `/ui/primevue`)    |
+| `naive-ui`          | `2.38.0+` (optional — only for `/ui/naive`)      |
+| `@vue/devtools-api` | `6+ / 7+ / 8+` (optional — only for `/devtools`) |
 
 Unlike most packages in this catalog, Vue itself is a **required** peer dependency here, not optional — the core (`useForm`, validators, parsers) is Vue-specific, not framework-agnostic.
 

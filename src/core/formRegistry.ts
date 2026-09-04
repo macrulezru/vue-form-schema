@@ -18,7 +18,13 @@ export interface RegisteredForm {
 }
 
 export type FormEventType =
-  'setField' | 'touch' | 'submit' | 'submitSuccess' | 'submitError' | 'reset' | 'asyncValidate'
+  | 'setField'
+  | 'touch'
+  | 'submit'
+  | 'submitSuccess'
+  | 'submitError'
+  | 'reset'
+  | 'asyncValidate'
 
 export interface FormEvent {
   formId: number
