@@ -118,6 +118,72 @@ const { values, errors, touched, isValid, isSubmitting, submit, setField } = use
 </template>
 ```
 
+### More examples
+
+#### A schema straight from Zod — typed out of the box
+
+`parseZod()` turns an ordinary Zod schema into form fields — value types come from `z.infer<>`, no `useForm<Values>()` needed.
+
+```ts
+import { z } from 'zod'
+import { parseZod } from '@macrulez/vue-form-schema/zod'
+import { useForm } from '@macrulez/vue-form-schema'
+
+const schema = z.object({
+  name: z.string().min(2).describe('Full name'),
+  age: z.number().min(0).optional(),
+  email: z.string().email(),
+  role: z.enum(['admin', 'user']),
+})
+
+const fields = parseZod(schema)
+const { values } = useForm({ schema: fields })
+
+// values.value.name is string, values.value.age is number | undefined, ...
+// — inferred automatically from `schema` via z.infer<typeof schema>, no
+// useForm<Values>(...) needed.
+```
+
+#### Fields that show and hide themselves
+
+`visible` takes a function of the current values — the field only renders and validates while the condition holds, and `clearOnHide` resets it once hidden.
+
+```ts
+import type { FieldDefinition } from '@macrulez/vue-form-schema'
+import { useForm } from '@macrulez/vue-form-schema'
+
+const schema: FieldDefinition[] = [
+  { type: 'checkbox', name: 'hasCompany', label: 'I represent a company' },
+  {
+    type: 'text',
+    name: 'companyName',
+    label: 'Company name',
+    visible: (values) => values['hasCompany'] === true,
+    required: true,
+  },
+]
+
+const { values } = useForm({ schema, clearOnHide: true })
+```
+
+#### Backend errors land on the right fields automatically
+
+`applyServerErrors` parses a Laravel/DRF response (or any shape via a custom mapper) and maps errors onto the right fields on its own — no hand-rolled response unwrapping per backend.
+
+```ts
+import { applyServerErrors } from '@macrulez/vue-form-schema'
+
+const res = await fetch('/api/users', { method: 'POST', body: JSON.stringify(form.values.value) })
+
+if (!res.ok) {
+  const { formErrors } = applyServerErrors(form, await res.json(), { format: 'laravel' })
+  if (formErrors.length) toast.error(formErrors[0]) // errors not tied to a field
+}
+
+// Built-in formats: 'laravel', 'drf', 'flat' — or pass your own mapper.
+// The next client-side validation naturally replaces a stale server error.
+```
+
 ---
 
 ## Documentation & links
