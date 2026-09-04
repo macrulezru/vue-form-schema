@@ -58,8 +58,7 @@ export interface FieldDefinition {
   mask?: string | MaskConfig
   /** For select / radio — static list, sync function, or async function */
   options?:
-    | FieldOption[]
-    | ((values: Record<string, unknown>) => FieldOption[] | Promise<FieldOption[]>)
+    FieldOption[] | ((values: Record<string, unknown>) => FieldOption[] | Promise<FieldOption[]>)
   /**
    * Field names whose values trigger re-fetching of async options.
    * Only relevant when `options` is an async function.
@@ -181,11 +180,4 @@ export interface UseFormReturn<T extends Record<string, unknown> = Record<string
 // ─── Built-in validator rule names ───────────────────────────────────────────
 
 export type BuiltinRule =
-  | 'required'
-  | 'minLength'
-  | 'maxLength'
-  | 'min'
-  | 'max'
-  | 'pattern'
-  | 'email'
-  | 'url'
+  'required' | 'minLength' | 'maxLength' | 'min' | 'max' | 'pattern' | 'email' | 'url'

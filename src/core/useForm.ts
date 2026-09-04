@@ -146,8 +146,7 @@ export function useForm<T extends Record<string, unknown> = Record<string, unkno
   // label for the DevTools plugin (vue-form-schema/devtools); has no effect
   // when devtools isn't installed.
   const callerComponentType = getCurrentInstance()?.type as
-    | { __name?: string; name?: string }
-    | undefined
+    { __name?: string; name?: string } | undefined
   const callerComponentName = callerComponentType?.__name ?? callerComponentType?.name
 
   const rawFields: FieldDefinition[] = normaliseSchema(schema)

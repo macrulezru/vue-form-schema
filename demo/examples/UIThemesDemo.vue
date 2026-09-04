@@ -114,8 +114,7 @@ import { NaiveFormRenderer } from 'vue-form-schema/ui/naive'
 // Same schema, same form composable — just swap the renderer
 &lt;ShadcnFormRenderer :form="form" submit-label="Save" /&gt;
 &lt;PrimeVueFormRenderer :form="form" submit-label="Save" /&gt;
-&lt;NaiveFormRenderer :form="form" submit-label="Save" /&gt;</pre
-      >
+&lt;NaiveFormRenderer :form="form" submit-label="Save" /&gt;</pre>
     </div>
   </div>
 </template>

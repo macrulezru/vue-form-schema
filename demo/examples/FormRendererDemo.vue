@@ -72,8 +72,7 @@ const stars = [1, 2, 3, 4, 5]
         Just pass <code>:form="form"</code> — no additional markup needed.
       </p>
       <pre class="code-block" style="margin-bottom: 16px">
-&lt;FormRenderer :form="contactForm" submit-label="Send message" /&gt;</pre
-      >
+&lt;FormRenderer :form="contactForm" submit-label="Send message" /&gt;</pre>
 
       <FormRenderer :form="contactForm" submit-label="Send message" />
 
@@ -97,8 +96,7 @@ const stars = [1, 2, 3, 4, 5]
   &lt;template #submit="{ isSubmitting, isValid }"&gt;
     &lt;!-- custom submit area --&gt;
   &lt;/template&gt;
-&lt;/FormRenderer&gt;</pre
-      >
+&lt;/FormRenderer&gt;</pre>
 
       <FormRenderer :form="ratingForm">
         <!-- Custom star-rating widget replaces the number field -->
@@ -178,8 +176,7 @@ const myComponents = {
   select:   ElSelect,
 }
 
-&lt;FormRenderer :form="form" :components="myComponents" /&gt;</pre
-      >
+&lt;FormRenderer :form="form" :components="myComponents" /&gt;</pre>
     </div>
   </div>
 </template>

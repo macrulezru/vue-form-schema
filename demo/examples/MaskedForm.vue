@@ -168,8 +168,7 @@ applyMask('{{ rawInput }}', { preset: '{{ selectedPreset }}' })
 → '{{ maskedOutput() }}'
 
 removeMask('{{ maskedOutput() }}', { preset: '{{ selectedPreset }}' })
-→ '{{ rawOutput() }}'</pre
-      >
+→ '{{ rawOutput() }}'</pre>
     </div>
 
     <!-- Masked fields connected to useForm -->

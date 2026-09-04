@@ -129,8 +129,7 @@ visible: (values) => values.accountType === 'business'
 visible: 'values.age >= 18'
 
 // useForm config
-useForm({ schema, clearOnHide: true })</pre
-      >
+useForm({ schema, clearOnHide: true })</pre>
     </div>
 
     <div class="card">

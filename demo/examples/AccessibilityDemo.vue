@@ -126,8 +126,7 @@ const form = useForm({
   &lt;legend&gt;Experience level *&lt;/legend&gt;
   &lt;div&gt;&lt;label&gt;&lt;input type="radio" name="level" /&gt; Junior&lt;/label&gt;&lt;/div&gt;
   …
-&lt;/fieldset&gt;</pre
-      >
+&lt;/fieldset&gt;</pre>
     </div>
   </div>
 </template>

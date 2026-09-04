@@ -104,8 +104,7 @@ import { TailwindFormRenderer } from 'vue-form-schema/ui/tailwind'
 &lt;TailwindFormRenderer :form="form" submit-label="Save" /&gt;
 
 // Override individual field types
-&lt;TailwindFormRenderer :form="form" :components="{ text: MyInput }" /&gt;</pre
-      >
+&lt;TailwindFormRenderer :form="form" :components="{ text: MyInput }" /&gt;</pre>
     </div>
   </div>
 </template>
