@@ -95,8 +95,7 @@ const form = useForm({
     <div class="card">
       <div class="card-title">PillToggle replaces all checkboxes</div>
       <pre class="code-block" style="margin-bottom: 16px">
-provideRegistry({ checkbox: PillToggle })</pre
-      >
+provideRegistry({ checkbox: PillToggle })</pre>
       <FormRenderer :form="form" submit-label="Deploy" />
       <div v-if="submitted" class="toast">
         ✅ Deployed "{{ submitted.service }}" to {{ submitted.region }}
@@ -117,8 +116,7 @@ const schema = [
     name: 'agree',
     component: MySpecialToggle,   // overrides registry for this field only
   },
-]</pre
-      >
+]</pre>
     </div>
 
     <div class="card">

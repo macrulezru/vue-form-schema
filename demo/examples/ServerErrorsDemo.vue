@@ -55,8 +55,7 @@ const form = useForm({
       <pre class="code-block">
 const { formErrors } = applyServerErrors(form, await res.json(), { format: 'laravel' })
 // fieldErrors are applied to form.errors automatically and the fields are touched
-// formErrors (not tied to a field) are returned for you to display yourself</pre
-      >
+// formErrors (not tied to a field) are returned for you to display yourself</pre>
     </div>
 
     <div class="card">
