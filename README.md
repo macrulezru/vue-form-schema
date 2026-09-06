@@ -36,6 +36,17 @@ Reactive forms from a declarative schema (JSON, Zod, Yup, or Valibot) for Vue 3.
 
 ---
 
+## When you'd reach for this
+
+The backend already describes a form's shape in JSON Schema, OpenAPI, or a Zod type — vue-form-schema turns that description straight into a working form on screen, instead of manually duplicating the same fields and validation rules in a Vue component.
+
+- **Some fields appear depending on others** — Picking "business" reveals a tax ID field, and "individual" reveals passport details, and the two shouldn't show at once — the form decides on its own which fields to show and validate based on what's already been chosen.
+- **A form needs a list with a variable number of rows** — A list of phone numbers, invoice line items, or team members — the user adds and removes rows freely, and every new row gets validated and cleared the same way the first one was.
+- **A long form is split into several steps** — A ten-screen questionnaire is intimidating shown all at once — the form is broken into steps with its own validation for each, and the next step only opens once the previous one checks out.
+- **The server rejects a form for a reason the client never checked** — An email being already taken can only be discovered after submitting to the server. The response maps onto the right form fields in one call, so the email field itself turns red, not a generic "something went wrong" banner at the top.
+
+---
+
 ## Installation
 
 | Environment         | Minimum version                                  |
