@@ -186,6 +186,67 @@ describe('persist option', () => {
     await nextTick()
     expect(localStorage.getItem('reset-key')).toBeNull()
   })
+
+  it('warns when persist is enabled without an explicit persistKey', () => {
+    // Regression: the default persistKey is just field names joined together —
+    // no warning meant two unrelated forms sharing field names silently shared
+    // storage with no indication anything was wrong.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    mount(
+      defineComponent({
+        setup() {
+          return useForm({ schema, persist: 'local' })
+        },
+        template: '<div/>',
+      }),
+    )
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('persistKey'))
+    warn.mockRestore()
+  })
+
+  it('does not warn when an explicit persistKey is provided', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    mount(
+      defineComponent({
+        setup() {
+          return useForm({ schema, persist: 'local', persistKey: 'explicit-key' })
+        },
+        template: '<div/>',
+      }),
+    )
+    expect(warn).not.toHaveBeenCalled()
+    warn.mockRestore()
+  })
+
+  it('two unrelated forms with identical field names default to the same storage key', async () => {
+    // Documents the actual collision the warning above is about — schemaA and
+    // schemaB are unrelated but share a field name/order, so their default keys
+    // collide and one form's persisted value silently leaks into the other.
+    const schemaA: FieldDefinition[] = [{ type: 'text', name: 'name', defaultValue: '' }]
+    const schemaB: FieldDefinition[] = [{ type: 'text', name: 'name', defaultValue: '' }]
+    const wA = mount(
+      defineComponent({
+        setup() {
+          return useForm({ schema: schemaA, persist: 'local' })
+        },
+        template: '<div/>',
+      }),
+    )
+    wA.vm.setField('name', 'from-form-a')
+    await nextTick()
+
+    const wB = mount(
+      defineComponent({
+        setup() {
+          return useForm({ schema: schemaB, persist: 'local' })
+        },
+        template: '<div/>',
+      }),
+    )
+    await nextTick()
+
+    expect(wB.vm.values.name).toBe('from-form-a')
+  })
 })
 
 // ─── #16 Async options ────────────────────────────────────────────────────────
@@ -262,6 +323,78 @@ describe('async options', () => {
     await nextTick()
     await nextTick()
     expect(fetchCount).toBeGreaterThan(before)
+  })
+
+  it('does not re-invoke an async options function when an unrelated field changes', async () => {
+    // Regression: the shared condition-evaluation watchEffect used to call every
+    // function-valued options() on every value change in the whole form (to check
+    // whether the result was a Promise), not just when that field's own
+    // optionsDeps changed — so an async options() still fired (and its side
+    // effects, e.g. a fetch, still started) on completely unrelated edits, even
+    // though only the optionsDeps-triggered result was ever actually used.
+    let fetchCount = 0
+    const asyncOpts = async (): Promise<FieldOption[]> => {
+      fetchCount++
+      return [{ label: 'X', value: 'x' }]
+    }
+    const schema: FieldDefinition[] = [
+      { type: 'text', name: 'unrelated' },
+      { type: 'select', name: 'city', options: asyncOpts, optionsDeps: ['country'] },
+    ]
+    const w = mount(
+      defineComponent({
+        setup() {
+          return useForm({ schema })
+        },
+        template: '<div/>',
+      }),
+    )
+    await nextTick()
+    await nextTick()
+    const afterMount = fetchCount
+    expect(afterMount).toBe(1) // the initial on-mount fetch
+
+    w.vm.setField('unrelated', 'a')
+    await nextTick()
+    w.vm.setField('unrelated', 'b')
+    await nextTick()
+    w.vm.setField('unrelated', 'c')
+    await nextTick()
+
+    expect(fetchCount).toBe(afterMount)
+  })
+
+  it('still evaluates a synchronous values-dependent options function on every relevant change', async () => {
+    // Sanity check that the fix above didn't also break the legitimate, fully
+    // synchronous "options depend on current values" pattern (no optionsDeps
+    // involved at all, since there's nothing async to defer).
+    const schema: FieldDefinition[] = [
+      { type: 'text', name: 'country' },
+      {
+        type: 'select',
+        name: 'city',
+        options: (values) =>
+          values.country === 'DE'
+            ? [{ label: 'Berlin', value: 'berlin' }]
+            : [{ label: 'Paris', value: 'paris' }],
+      },
+    ]
+    const w = mount(
+      defineComponent({
+        setup() {
+          return useForm({ schema })
+        },
+        template: '<div/>',
+      }),
+    )
+    await nextTick()
+    let city = w.vm.fields.find((f: FieldDefinition) => f.name === 'city')
+    expect((city?.options as FieldOption[])[0].value).toBe('paris')
+
+    w.vm.setField('country', 'DE')
+    await nextTick()
+    city = w.vm.fields.find((f: FieldDefinition) => f.name === 'city')
+    expect((city?.options as FieldOption[])[0].value).toBe('berlin')
   })
 })
 

@@ -320,6 +320,18 @@ export class ConditionEvaluator {
   private stopHandle: (() => void) | null = null
 
   /**
+   * Names of fields whose `options` function is known to be async — populated by
+   * useForm (statically, for functions declared with the `async` keyword, and
+   * dynamically once a field's options function is observed to return a Promise).
+   * evaluateFields() skips calling these entirely: invoking an async options
+   * function is a real side effect (e.g. starting a fetch), and useForm's own
+   * optionsDeps-scoped fetchAsyncOptions already owns fetching/caching their
+   * result — calling them again here on every unrelated value change would just
+   * fire (and discard) redundant requests.
+   */
+  readonly asyncFieldNames = new Set<string>()
+
+  /**
    * Start reactively watching values and writing evaluated fields into
    * `resolvedFields`. Also handles clearOnHide side effect.
    */
@@ -354,11 +366,17 @@ export class ConditionEvaluator {
       const visible = this.resolveBoolean(field.visible, values, true)
       const disabled = this.resolveBoolean(field.disabled, values, false)
       // Async options functions are handled by useForm — return undefined here so
-      // the async cache value (merged later) takes precedence.
+      // the async cache value (merged later) takes precedence. Known-async fields
+      // are skipped entirely (not called at all) to avoid firing their side
+      // effects on every unrelated value change; a field not yet known to be
+      // async still gets called once here (before that's discovered), same as
+      // before this field existed.
       let options: FieldDefinition['options']
-      if (typeof field.options === 'function') {
+      if (typeof field.options === 'function' && !this.asyncFieldNames.has(field.name)) {
         const result = field.options(values)
         options = result instanceof Promise ? undefined : result
+      } else if (typeof field.options === 'function') {
+        options = undefined
       } else {
         options = field.options
       }

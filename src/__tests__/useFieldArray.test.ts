@@ -109,6 +109,113 @@ describe('useFieldArray — mutations', () => {
   })
 })
 
+describe('useFieldArray — errors/touched renumbering', () => {
+  // Regression: remove/move/swap (and prepend) mutate the underlying array but
+  // used to leave form.errors/form.touched keyed by the *old* row indices — so
+  // after a reorder/removal, a row could inherit another row's stale
+  // error/touched state purely because its index shifted, with no relation to
+  // that row's own content.
+
+  it('remove() shifts down errors/touched for every row after the removed one, and drops the removed row entirely', async () => {
+    const w = mountArray()
+    w.vm.arr.append({ title: 'A' })
+    w.vm.arr.append({ title: 'B' })
+    w.vm.arr.append({ title: 'C' })
+    await nextTick()
+    w.vm.form.errors.value = {
+      'items.0.title': ['error on A'],
+      'items.1.title': ['error on B'],
+      'items.2.title': ['error on C'],
+    }
+    w.vm.form.touched.value = {
+      'items.0.title': true,
+      'items.1.title': true,
+      'items.2.title': true,
+    }
+
+    w.vm.arr.remove(0) // removes A; B and C shift down to indices 0 and 1
+    await nextTick()
+
+    expect(w.vm.form.errors.value['items.0.title']).toEqual(['error on B'])
+    expect(w.vm.form.errors.value['items.1.title']).toEqual(['error on C'])
+    expect(w.vm.form.errors.value['items.2.title']).toBeUndefined()
+    expect(w.vm.form.touched.value).toEqual({ 'items.0.title': true, 'items.1.title': true })
+  })
+
+  it('move() renumbers errors/touched to follow the moved and shifted rows', async () => {
+    const w = mountArray()
+    w.vm.arr.append({ title: 'A' })
+    w.vm.arr.append({ title: 'B' })
+    w.vm.arr.append({ title: 'C' })
+    await nextTick()
+    w.vm.form.errors.value = {
+      'items.0.title': ['error on A'],
+      'items.1.title': ['error on B'],
+      'items.2.title': ['error on C'],
+    }
+
+    w.vm.arr.move(0, 2) // A -> index 2; B, C shift down to 0, 1
+    await nextTick()
+
+    expect(w.vm.form.errors.value['items.0.title']).toEqual(['error on B'])
+    expect(w.vm.form.errors.value['items.1.title']).toEqual(['error on C'])
+    expect(w.vm.form.errors.value['items.2.title']).toEqual(['error on A'])
+  })
+
+  it('swap() exchanges errors/touched between exactly the two swapped rows', async () => {
+    const w = mountArray()
+    w.vm.arr.append({ title: 'A' })
+    w.vm.arr.append({ title: 'B' })
+    await nextTick()
+    w.vm.form.errors.value = {
+      'items.0.title': ['error on A'],
+      'items.1.title': ['error on B'],
+    }
+    w.vm.form.touched.value = { 'items.0.title': true }
+
+    w.vm.arr.swap(0, 1)
+    await nextTick()
+
+    expect(w.vm.form.errors.value['items.0.title']).toEqual(['error on B'])
+    expect(w.vm.form.errors.value['items.1.title']).toEqual(['error on A'])
+    expect(w.vm.form.touched.value).toEqual({ 'items.1.title': true })
+  })
+
+  it("prepend() shifts every existing row's errors/touched up by one", async () => {
+    const w = mountArray()
+    w.vm.arr.append({ title: 'A' })
+    w.vm.arr.append({ title: 'B' })
+    await nextTick()
+    w.vm.form.errors.value = {
+      'items.0.title': ['error on A'],
+      'items.1.title': ['error on B'],
+    }
+
+    w.vm.arr.prepend({ title: 'new-first' })
+    await nextTick()
+
+    expect(w.vm.form.errors.value['items.0.title']).toBeUndefined()
+    expect(w.vm.form.errors.value['items.1.title']).toEqual(['error on A'])
+    expect(w.vm.form.errors.value['items.2.title']).toEqual(['error on B'])
+  })
+
+  it('leaves errors/touched for unrelated fields (outside this array) untouched', async () => {
+    const w = mountArray()
+    w.vm.arr.append({ title: 'A' })
+    w.vm.arr.append({ title: 'B' })
+    await nextTick()
+    w.vm.form.errors.value = {
+      'items.0.title': ['error on A'],
+      otherField: ['unrelated error'],
+    }
+
+    w.vm.arr.remove(0)
+    await nextTick()
+
+    expect(w.vm.form.errors.value['otherField']).toEqual(['unrelated error'])
+  })
+})
+
 describe('useFieldArray — setField via prefixed path', () => {
   it('setField on prefixed path updates array item', async () => {
     const w = mountArray()

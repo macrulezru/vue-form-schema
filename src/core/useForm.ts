@@ -152,6 +152,15 @@ export function useForm<T extends Record<string, unknown> = Record<string, unkno
   const rawFields: FieldDefinition[] = normaliseSchema(schema)
   const engine = new ValidationEngine(300, validateMode)
   const evaluator = new ConditionEvaluator()
+  // Fields declared with an `async` options function are known-async up front,
+  // without ever having to call them — see asyncFieldNames' own doc comment.
+  // A plain function that manually returns a Promise is still discovered (and
+  // stopped) dynamically, the first time fetchAsyncOptions() calls it.
+  for (const field of rawFields) {
+    if (typeof field.options === 'function' && field.options.constructor.name === 'AsyncFunction') {
+      evaluator.asyncFieldNames.add(field.name)
+    }
+  }
   // Filled in once the full UseFormReturn object exists, right before
   // returning — see the bottom of this function. Declared here (not there)
   // so setField/touchField/submit/reset can close over it.
@@ -159,7 +168,18 @@ export function useForm<T extends Record<string, unknown> = Record<string, unkno
 
   // ── Persist helpers ───────────────────────────────────────────────────────
 
+  // The default key is only field names, joined — two unrelated forms that
+  // happen to declare identically-named (and identically-ordered) fields
+  // silently share the same persisted storage entry. Hashing this string
+  // wouldn't help (the same input still produces the same hash for both
+  // forms); the only real fix is a caller-supplied, actually-distinguishing
+  // persistKey, hence the warning below rather than a "smarter" default.
   const storageKey = persistKey ?? `vfs:${rawFields.map((f) => f.name).join(',')}`
+  if (persist && !persistKey) {
+    console.warn(
+      '[vue-form-schema] persist is enabled without an explicit persistKey — the default key is derived only from field names, so two unrelated forms with the same field names (and order) will silently share persisted storage. Pass a unique persistKey to avoid this.',
+    )
+  }
 
   function getStorage(): Storage | null {
     if (typeof window === 'undefined' || !persist) return null
@@ -177,6 +197,10 @@ export function useForm<T extends Record<string, unknown> = Record<string, unkno
   const isSubmitting = ref(false)
   const resolvedFields = ref<FieldDefinition[]>(rawFields)
   const optionsLoading = ref<Record<string, boolean>>({})
+  // true from the moment a field's async validator is scheduled (debounce start)
+  // until its result lands — read by isValidating/isValid below, since errors.value
+  // isn't updated yet during that window and shouldn't be read as "no error found".
+  const asyncValidating = ref<Record<string, boolean>>({})
   const asyncOptionsCache = ref<Record<string, FieldDefinition['options']>>({})
   // tracks which fields have been blurred at least once — used by 'eager' mode
   const firstBlurred = new Set<string>()
@@ -198,6 +222,10 @@ export function useForm<T extends Record<string, unknown> = Record<string, unkno
     if (typeof field.options !== 'function') return
     const result = field.options(values.value as Record<string, unknown>)
     if (!(result instanceof Promise)) return
+    // Now confirmed async — evaluator.evaluateFields() stops calling this field's
+    // options function on every value change from here on (see asyncFieldNames'
+    // own doc comment for why that matters).
+    evaluator.asyncFieldNames.add(field.name)
     optionsLoading.value = { ...optionsLoading.value, [field.name]: true }
     try {
       const opts = await result
@@ -258,7 +286,24 @@ export function useForm<T extends Record<string, unknown> = Record<string, unkno
           field.optionsDeps!.map((dep: string) =>
             getByPath(values.value as Record<string, unknown>, dep),
           ),
-        () => fetchAsyncOptions(field),
+        (newDeps, oldDeps) => {
+          // `values` is replaced wholesale (a brand-new object) on every setField
+          // call, for any field — so this getter re-runs, and .map() returns a
+          // freshly-allocated array, on every single value change in the whole
+          // form, not just when this field's own optionsDeps actually changed.
+          // Vue's default (non-deep) equality check compares that array by
+          // reference, which is always "changed" — so without this explicit
+          // element-wise comparison, an unrelated edit anywhere in the form would
+          // re-fetch this field's options too.
+          if (
+            oldDeps &&
+            newDeps.length === oldDeps.length &&
+            newDeps.every((v, i) => Object.is(v, oldDeps[i]))
+          ) {
+            return
+          }
+          fetchAsyncOptions(field)
+        },
       )
     }
   }
@@ -298,7 +343,17 @@ export function useForm<T extends Record<string, unknown> = Record<string, unkno
     () => !deepEqual(values.value as Record<string, unknown>, initialSnapshot),
   )
 
+  // True while any field's async validator has been scheduled (debounce started
+  // or in flight) but hasn't resolved yet — isValid below reads this so it can't
+  // report `true` merely because a pending check hasn't reported a failure yet.
+  // Only submit() previously waited reliably; every other read of isValid could
+  // observe a stale "no error yet" as "valid".
+  const isValidating: ComputedRef<boolean> = computed(() =>
+    Object.values(asyncValidating.value).some(Boolean),
+  )
+
   const isValid: ComputedRef<boolean> = computed(() => {
+    if (isValidating.value) return false
     const errs = engine.validateAll(resolvedFields.value, values.value as Record<string, unknown>)
     const syncValid = Object.values(errs).every((e) => e.length === 0)
     // errors.value also carries the latest resolved async-validator results
@@ -320,6 +375,9 @@ export function useForm<T extends Record<string, unknown> = Record<string, unkno
       )
       errors.value = { ...errors.value, [field.name]: fieldErrors }
 
+      if (field.asyncValidators?.length) {
+        asyncValidating.value = { ...asyncValidating.value, [field.name]: true }
+      }
       engine.validateAsync(
         field,
         getByPath(values.value as Record<string, unknown>, field.name),
@@ -329,6 +387,7 @@ export function useForm<T extends Record<string, unknown> = Record<string, unkno
             ...errors.value,
             [path]: [...(errors.value[path] ?? []), ...asyncErrors],
           }
+          asyncValidating.value = { ...asyncValidating.value, [path]: false }
           emitFormEvent(formId, 'asyncValidate', { path, errors: asyncErrors })
         },
       )
@@ -433,6 +492,7 @@ export function useForm<T extends Record<string, unknown> = Record<string, unkno
     )
     errors.value = {}
     touched.value = {}
+    asyncValidating.value = {}
     isSubmitting.value = false
     skipPersist = true
     getStorage()?.removeItem(storageKey)
@@ -459,6 +519,7 @@ export function useForm<T extends Record<string, unknown> = Record<string, unkno
     optionsLoading,
     isDirty,
     isValid,
+    isValidating,
     isSubmitting,
     submit,
     reset,

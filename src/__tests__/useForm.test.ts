@@ -305,6 +305,47 @@ describe('useForm — async validators', () => {
     await wrapper.vm.submit()
     expect(wrapper.vm.isValid).toBe(false)
   })
+
+  it('isValid is false (not true) while an async validator is still pending, before it resolves', async () => {
+    // Regression: isValid used to read the sync result plus whatever stale
+    // errors.value happened to already hold — a field whose async validator was
+    // scheduled but hadn't resolved yet (debounce still running) reported
+    // isValid: true, since no failure had been recorded there *yet*. Only
+    // submit() (which awaits validateAllAsync directly) reliably waited.
+    vi.useFakeTimers()
+    const wrapper = mountForm({ schema: schemaWithAsync, validateOn: 'input' })
+    wrapper.vm.setField('username', 'taken')
+    await nextTick()
+
+    // Sync validation already ran (required passes); the async validator is
+    // debounced and hasn't fired yet — this is exactly the window that used to
+    // read as valid.
+    expect(wrapper.vm.isValidating).toBe(true)
+    expect(wrapper.vm.isValid).toBe(false)
+
+    await vi.advanceTimersByTimeAsync(300)
+    await nextTick()
+
+    expect(wrapper.vm.isValidating).toBe(false)
+    expect(wrapper.vm.isValid).toBe(false) // now genuinely resolved as invalid
+    vi.useRealTimers()
+  })
+
+  it('isValidating resolves to false and isValid to true once a pending async validator passes', async () => {
+    vi.useFakeTimers()
+    const wrapper = mountForm({ schema: schemaWithAsync, validateOn: 'input' })
+    wrapper.vm.setField('username', 'free')
+    await nextTick()
+
+    expect(wrapper.vm.isValidating).toBe(true)
+
+    await vi.advanceTimersByTimeAsync(300)
+    await nextTick()
+
+    expect(wrapper.vm.isValidating).toBe(false)
+    expect(wrapper.vm.isValid).toBe(true)
+    vi.useRealTimers()
+  })
 })
 
 describe('useForm — dynamic options', () => {

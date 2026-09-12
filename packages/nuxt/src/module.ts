@@ -1,4 +1,4 @@
-import { addComponent, addImports, defineNuxtModule } from '@nuxt/kit'
+import { addComponent, addImports, addPlugin, createResolver, defineNuxtModule } from '@nuxt/kit'
 
 export interface ModuleOptions {
   /**
@@ -17,6 +17,15 @@ export interface ModuleOptions {
    * @default false
    */
   components?: boolean
+  /**
+   * Auto-install the Vue DevTools inspector/timeline (`installFormDevtools`)
+   * during `nuxt dev`, instead of requiring a manual call — unlike the base
+   * package (no single `app.use()` entry point to hook), this module already
+   * owns Nuxt's plugin registration, which is the natural place for it.
+   * Never registered outside `nuxt dev` regardless of this setting.
+   * @default true
+   */
+  devtools?: boolean
 }
 
 declare module '@nuxt/schema' {
@@ -84,6 +93,7 @@ export default defineNuxtModule<ModuleOptions>({
   defaults: {
     autoImports: true,
     components: false,
+    devtools: true,
   },
   setup(options, nuxt) {
     nuxt.hook('prepare:types', ({ references }) => {
@@ -110,6 +120,11 @@ export default defineNuxtModule<ModuleOptions>({
         export: 'MultiStepFormRenderer',
         filePath: `${CORE_MODULE}/ui`,
       })
+    }
+
+    if (options.devtools && nuxt.options.dev) {
+      const resolver = createResolver(import.meta.url)
+      addPlugin(resolver.resolve('./runtime/devtools-plugin'))
     }
   },
 })
