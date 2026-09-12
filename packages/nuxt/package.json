@@ -31,12 +31,14 @@
     "access": "public"
   },
   "scripts": {
-    "prepack": "npm run typecheck && npm run build",
+    "prepack": "npm run typecheck && npm run test && npm run build",
     "build": "nuxt-module-build build",
     "dev": "node scripts/nuxi.mjs dev playground",
     "dev:build": "node scripts/nuxi.mjs build playground",
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && node scripts/nuxi.mjs prepare playground",
-    "typecheck": "npm run dev:prepare && tsc --noEmit"
+    "typecheck": "npm run dev:prepare && tsc --noEmit",
+    "pretest": "nuxt-module-build build --stub && nuxt-module-build prepare",
+    "test": "vitest run"
   },
   "keywords": [
     "nuxt",
@@ -54,7 +56,8 @@
     "@nuxt/module-builder": "^1.0.3",
     "@nuxt/schema": "^3.21.0",
     "nuxt": "^3.21.0",
-    "typescript": "^5.3.0"
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
   },
   "peerDependencies": {
     "nuxt": "^3.13.0 || ^4.0.0"

@@ -42,5 +42,8 @@ jobs:
       - name: Typecheck Nuxt module
         run: npm run typecheck:nuxt
 
+      - name: Test Nuxt module
+        run: npm run test:nuxt
+
       - name: Build Nuxt module
         run: npm run build:nuxt
