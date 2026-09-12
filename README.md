@@ -31,7 +31,7 @@ Reactive forms from a declarative schema (JSON, Zod, Yup, or Valibot) for Vue 3.
 - **Accessibility** — `aria-required`, `aria-invalid`, `aria-describedby`, `fieldset`/`legend` for radio
 - **SSR-safe** — no direct browser APIs in the core
 - **Tree-shakeable** — Zod/Yup/Valibot adapters and UI are separate entry points
-- **Nuxt module** — [`@macrulez/nuxt-vue-form-schema`](https://npm.vuecraft.ru/en/packages/vue-form-schema/guide/nuxt-module.html) auto-imports composables, validators and schema adapters
+- **Nuxt module** — [`@macrulez/nuxt-vue-form-schema`](https://npm.vuecraft.ru/en/packages/vue-form-schema/guide/nuxt-module.html) auto-imports composables, validators and schema adapters (source lives in [`packages/nuxt`](packages/nuxt), not yet published to npm)
 - **Vue DevTools** — `vue-form-schema/devtools` adds a live forms inspector + timeline, zero cost when not installed
 
 ---
@@ -74,11 +74,7 @@ npm install yup       # Yup adapter
 npm install valibot   # Valibot adapter
 ```
 
-Using Nuxt? [`@macrulez/nuxt-vue-form-schema`](https://npm.vuecraft.ru/en/packages/vue-form-schema/guide/nuxt-module.html) auto-imports `useForm`, `useFieldArray`, the built-in validators, schema adapters and more:
-
-```bash
-npm install @macrulez/nuxt-vue-form-schema
-```
+Using Nuxt? [`@macrulez/nuxt-vue-form-schema`](https://npm.vuecraft.ru/en/packages/vue-form-schema/guide/nuxt-module.html) auto-imports `useForm`, `useFieldArray`, the built-in validators, schema adapters and more. **Not yet published to npm** — the module lives in [`packages/nuxt`](packages/nuxt) of this repo; until it's released, install it directly from the repo/tarball, or call the composables from `@macrulez/vue-form-schema` yourself.
 
 ### Quick start
 

@@ -170,6 +170,8 @@ export interface UseFormReturn<T extends Record<string, unknown> = Record<string
   optionsLoading: Ref<Record<string, boolean>>
   isDirty: ComputedRef<boolean>
   isValid: ComputedRef<boolean>
+  /** True while any field's async validator is scheduled or in flight, result not yet resolved */
+  isValidating: ComputedRef<boolean>
   isSubmitting: Ref<boolean>
   submit(): Promise<void>
   reset(values?: Partial<T>): void
