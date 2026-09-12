@@ -101,7 +101,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "build:nuxt": "npm run build --workspace=packages/nuxt",
-    "typecheck:nuxt": "npm run typecheck --workspace=packages/nuxt"
+    "typecheck:nuxt": "npm run typecheck --workspace=packages/nuxt",
+    "test:nuxt": "npm run test --workspace=packages/nuxt"
   },
   "keywords": [
     "vue",
