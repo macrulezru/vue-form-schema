@@ -2,8 +2,6 @@
 
 Nuxt module for [@macrulez/vue-form-schema](https://github.com/macrulezru/vue-form-schema) — auto-imports composables, schema adapters and (optionally) the headless UI components. No manual `import` statements needed for the library's public API inside your Nuxt app.
 
-**Not yet published to npm.** This module lives in this directory of the [vue-form-schema](https://github.com/macrulezru/vue-form-schema) repo; until it's released, install it directly from the repo or a local tarball rather than `npm install`.
-
 ## Installation
 
 ```bash
